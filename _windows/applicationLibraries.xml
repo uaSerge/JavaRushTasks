@@ -24,10 +24,14 @@
     <library name="org.slf4j:slf4j-api:1.7.23" type="repository">
       <properties maven-id="org.slf4j:slf4j-api:1.7.23" />
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.23/slf4j-api-1.7.23.jar!/" />
+        <root url="jar://C:/Idea/JavaRushTasks/lib/slf4j-api-1.7.23.jar!/" />
       </CLASSES>
-      <JAVADOC />
-      <SOURCES />
+      <JAVADOC>
+        <root url="jar://C:/Idea/JavaRushTasks/lib/slf4j-api-1.7.23-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://C:/Idea/JavaRushTasks/lib/slf4j-api-1.7.23-sources.jar!/" />
+      </SOURCES>
     </library>
   </component>
 </application>
