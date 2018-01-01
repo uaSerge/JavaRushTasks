@@ -7687,3 +7687,4350 @@ public class User {
     }
 }
 
+package com.javarush.task.task20.task2003;
+
+import java.io.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+/* 
+Знакомство с properties
+В методе fillInPropertiesMap считайте имя файла с консоли и заполни карту properties данными из файла.
+Про .properties почитать тут — http://ru.wikipedia.org/wiki/.properties
+Реализуй логику записи в файл и чтения из файла для карты properties.
+*/
+public class Solution {
+    public static Map<String, String> properties = new HashMap<>();
+
+    public void fillInPropertiesMap() {
+        //implement this method - реализуйте этот метод
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            String file = bufferedReader.readLine();
+            FileInputStream fileInputStream = new FileInputStream(file);
+            try {
+                load(fileInputStream);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void save(OutputStream outputStream) throws Exception {
+        //implement this method - реализуйте этот метод
+        Properties prop = new Properties();
+        prop.putAll(properties);
+        prop.store(outputStream,null);
+        outputStream.flush();
+        outputStream.close();
+    }
+
+    public void load(InputStream inputStream) throws Exception {
+        //implement this method - реализуйте этот метод
+        Properties prop = new Properties();
+        prop.load(inputStream);
+        Enumeration<?> e = prop.propertyNames();
+        while (e.hasMoreElements()) {
+            String key = (String) e.nextElement();
+            String value = prop.getProperty(key);
+            properties.put(key,value);
+//            System.out.println("Key : " + key + ", Value : " + value);
+        }
+        inputStream.close();
+    }
+
+    public static void main(String[] args) {
+
+    }
+}
+package com.javarush.task.task20.task2004;
+
+import java.io.*;
+
+/* 
+Читаем и пишем в файл статики
+Реализуй логику записи в файл и чтения из файла для класса ClassWithStatic.
+Метод load должен инициализировать объект включая статические поля данными из файла.
+Метод main не участвует в тестировании.
+*/
+public class Solution {
+    public static void main(String[] args) {
+        //you can find your_file_name.tmp in your TMP directory or fix outputStream/inputStream according to your real file location
+        //вы можете найти your_file_name.tmp в папке TMP или исправьте outputStream/inputStream в соответствии с путем к вашему реальному файлу
+        try {
+
+            File your_file_name = File.createTempFile("your_file_name", null);
+            OutputStream outputStream = new FileOutputStream(your_file_name);
+            InputStream inputStream = new FileInputStream(your_file_name);
+
+            ClassWithStatic classWithStatic = new ClassWithStatic();
+            classWithStatic.i = 3;
+            classWithStatic.j = 4;
+            classWithStatic.save(outputStream);
+            outputStream.flush();
+
+            ClassWithStatic loadedObject = new ClassWithStatic();
+            loadedObject.staticString = "something";
+            loadedObject.i = 6;
+            loadedObject.j = 7;
+
+            loadedObject.load(inputStream);
+            //check here that classWithStatic object equals to loadedObject object - проверьте тут, что classWithStatic и loadedObject равны
+            if (classWithStatic.equals(loadedObject)) System.out.println("OK");
+            else System.out.println("Wrong!!!!!!!");
+            outputStream.close();
+            inputStream.close();
+
+        } catch (IOException e) {
+            //e.printStackTrace();
+            System.out.println("Oops, something wrong with my file");
+        } catch (Exception e) {
+            //e.printStackTrace();
+            System.out.println("Oops, something wrong with save/load method");
+        }
+    }
+
+    public static class ClassWithStatic {
+        public static String staticString = "it's test static string";
+        public int i;
+        public int j;
+
+        public void save(OutputStream outputStream) throws Exception {
+            //implement this method - реализуйте этот метод
+            PrintWriter pw = new PrintWriter(outputStream);
+            pw.println(staticString);
+            pw.println(i);
+            pw.println(j);
+            outputStream.flush();
+            pw.flush();
+        }
+
+        public void load(InputStream inputStream) throws Exception {
+            //implement this method - реализуйте этот метод
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+            staticString = br.readLine();
+            i = Integer.parseInt(br.readLine());
+            j = Integer.parseInt(br.readLine());
+            inputStream.close();
+            br.close();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            ClassWithStatic that = (ClassWithStatic) o;
+
+            if (i != that.i) return false;
+            return j == that.j;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = i;
+            result = 31 * result + j;
+            return result;
+        }
+    }
+}
+
+package com.javarush.task.task20.task2005;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/* 
+Очень странные дела
+При чтении/записи объектов типа Human возникают странные ошибки.
+Разберись в чем дело и исправь их.
+*/
+
+public class Solution {
+    public static void main(String[] args) {
+        //исправь outputStream/inputStream в соответствии с путем к твоему реальному файлу
+        try {
+            File your_file_name = File.createTempFile("your_file_name",null,new File("C:\\Idea\\JavaRushTasks\\temp"));
+            OutputStream outputStream = new FileOutputStream(your_file_name);
+            InputStream inputStream = new FileInputStream(your_file_name);
+
+            Human ivanov = new Human("Ivanov", new Asset("home"), new Asset("car"));
+            ivanov.save(outputStream);
+            outputStream.flush();
+
+            Human somePerson = new Human();
+            somePerson.load(inputStream);
+            //check here that ivanov equals to somePerson - проверьте тут, что ivanov и somePerson равны
+
+//            if (ivanov.equals(somePerson)) System.out.println("OK");
+//            else System.out.println("NOT");
+            System.out.println(ivanov.equals(somePerson));
+            inputStream.close();
+
+        } catch (IOException e) {
+            //e.printStackTrace();
+            System.out.println("Oops, something wrong with my file");
+        } catch (Exception e) {
+            //e.printStackTrace();
+            System.out.println("Oops, something wrong with save/load method");
+        }
+    }
+
+    public static class Human {
+        public String name;
+        public List<Asset> assets = new ArrayList<>();
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Human human = (Human) o;
+
+            if (name != null ? !name.equals(human.name) : human.name != null) return false;
+            return assets != null ? assets.equals(human.assets) : human.assets == null;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = name != null ? name.hashCode() : 0;
+            result = 31 * result + (assets != null ? assets.hashCode() : 0);
+            return (int) result;
+                    //(Math.random() * 100);
+        }
+
+        public Human() {
+        }
+
+        public Human(String name, Asset... assets) {
+            this.name = name;
+            if (assets != null) {
+                this.assets.addAll(Arrays.asList(assets));
+            }
+        }
+
+        public void save(OutputStream outputStream) throws Exception {
+            //implement this method - реализуйте этот метод
+            PrintWriter printWriter = new PrintWriter(outputStream);
+            printWriter.println(this.name);
+            if (this.assets.size() > 0) {
+                for (Asset current : this.assets)
+                    printWriter.println(current.getName());
+            }
+            printWriter.close();
+            outputStream.flush();
+        }
+
+        public void load(InputStream inputStream) throws Exception {
+            //implement this method - реализуйте этот метод
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            this.name = reader.readLine();
+            String assetName;
+            while ((assetName = reader.readLine()) != null)
+                this.assets.add(new Asset(assetName));
+            reader.close();
+        }
+    }
+}
+
+package com.javarush.task.task20.task2008;
+
+import java.io.*;
+
+/* 
+Как сериализовать Singleton?
+Два десериализованных объекта singleton и singleton1 имеют разные ссылки в памяти, а должны иметь одинаковые.
+В класс Singleton добавь один метод (погуглите), чтобы после десериализации ссылки на объекты были равны.
+Метод main не участвует в тестировании.
+*/
+public class Solution implements Serializable {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        Singleton instance = Singleton.getInstance();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        //Serializing the singleton instance
+        ObjectOutputStream oos = new ObjectOutputStream(byteArrayOutputStream);
+        oos.writeObject(instance);
+        oos.close();
+
+        //Recreating the instance by reading the serialized object data add
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+
+        ObjectInputStream ois = new ObjectInputStream(byteArrayInputStream);
+        Singleton singleton = (Singleton) ois.readObject();
+        ois.close();
+
+        //Recreating the instance AGAIN by reading the serialized object data add
+        byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+
+        ObjectInputStream ois2 = new ObjectInputStream(byteArrayInputStream);
+        Singleton singleton1 = (Singleton) ois2.readObject();
+        ois2.close();
+
+        //The singleton behavior has been broken
+        System.out.println("Instance reference check : " + singleton.getInstance());
+        System.out.println("Instance reference check : " + singleton1.getInstance());
+        System.out.println("=========================================================");
+        System.out.println("Object reference check : " + singleton);
+        System.out.println("Object reference check : " + singleton1);
+    }
+
+    public static class Singleton implements Serializable {
+        private static Singleton ourInstance;
+
+        public static Singleton getInstance() {
+            if (ourInstance == null) {
+                ourInstance = new Singleton();
+            }
+            return ourInstance;
+        }
+
+        private Object readResolve () {
+            return getInstance();
+        }
+
+        private Singleton() {
+        }
+    }
+}
+
+package com.javarush.task.task20.task2011;
+
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
+/*
+Externalizable для апартаментов
+Реализуй интерфейс Externalizable в классе Apartment.
+*/
+public class Solution {
+
+    public static class Apartment implements Externalizable{
+        private String address;
+        private int year;
+        /**
+         * Mandatory public no-arg constructor.
+         */
+        public Apartment() {
+            super();
+        }
+
+        public Apartment(String adr, int y) {
+            address = adr;
+            year = y;
+        }
+
+        @Override
+        public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(address);
+        out.writeInt(year);
+        }
+
+        @Override
+        public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        address = (String) in.readObject();
+        year = in.readInt();
+        }
+        /**
+         * Prints out the fields. used for testing!
+         */
+        public String toString() {
+            return("Address: " + address + "\n" + "Year: " + year);
+        }
+    }
+
+    public static void main(String[] args) {
+
+    }
+}
+
+package com.javarush.task.task20.task2014;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/* 
+Serializable Solution
+Подумай, какие поля не нужно сериализовать, пометь ненужные поля модификатором transient.
+Объект всегда должен содержать актуальные итоговые данные.
+
+*/
+public class Solution {
+    public static void main(String[] args) {
+        System.out.println(new Solution(4));
+    }
+
+    private final transient String pattern = "dd MMMM yyyy, EEEE";
+    private transient Date currentDate;
+    private transient int temperature;
+    String string;
+
+    public Solution(int temperature) {
+        this.currentDate = new Date();
+        this.temperature = temperature;
+
+        string = "Today is %s, and current temperature is %s C";
+        SimpleDateFormat format = new SimpleDateFormat(pattern);
+        this.string = String.format(string, format.format(currentDate), temperature);
+    }
+
+    @Override
+    public String toString() {
+        return this.string;
+    }
+}
+
+package com.javarush.task.task20.task2017;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+
+/* 
+Десериализация
+На вход подается поток, в который записан сериализованный объект класса A либо класса B.
+Десериализуй объект в методе getOriginalObject так, чтобы в случае возникновения исключения было выведено сообщение на экран и возвращен null.
+Реализуй интерфейс Serializable где необходимо.
+*/
+public class Solution {
+    public A getOriginalObject(ObjectInputStream objectStream) {
+        try {
+            if (objectStream.readObject() instanceof A) {
+                return (A) objectStream.readObject();
+            } else return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public class A implements Serializable{
+    }
+
+    public class B extends A {
+        public B() {
+            System.out.println("inside B");
+        }
+    }
+
+    public static void main(String[] args) {
+
+    }
+}
+
+package com.javarush.task.task20.task2018;
+import java.io.*;
+/* 
+Найти ошибки
+Почему-то при сериализации/десериализации объекта класса B возникают ошибки.
+Найди проблему и исправь ее.
+Класс A не должен реализовывать интерфейсы Serializable и Externalizable.
+В сигнатуре класса В ошибки нет :).
+Метод main не участвует в тестировании.
+*/
+public class Solution {
+    public static class A {
+        protected String name = "A";
+
+        public A(String name) {
+            this.name += name;
+        }
+    }
+
+    public class B extends A implements Serializable {
+        public B(String name) {
+            super(name);
+            this.name += name;
+        }
+        private void writeObject (ObjectOutputStream outputStream) throws IOException, ClassNotFoundException {
+                outputStream.defaultWriteObject();
+                outputStream.writeObject(name);
+        }
+
+        private  void readObject (ObjectInputStream inputStream)  throws IOException, ClassNotFoundException{
+            Object object = new Object();
+            name = (String) inputStream.readObject();
+                inputStream.defaultReadObject();
+                 object = inputStream.readObject();
+        }
+    }
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(arrayOutputStream);
+
+        Solution solution = new Solution();
+        B b = solution.new B("B2");
+        System.out.println(b.name);
+
+        oos.writeObject(b);
+
+        ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(arrayOutputStream.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(arrayInputStream);
+
+        B b1 = (B)ois.readObject();
+        System.out.println(b1.name);
+    }
+}
+
+package com.javarush.task.task31.task3103;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+
+/* 
+Своя реализация
+Реализуй логику методов:
+1. readBytes — должен возвращать все байты файла fileName.
+2. readLines — должен возвращать все строки файла fileName. Используй кодировку по умолчанию.
+3. writeBytes — должен записывать массив bytes в файл fileName.
+4. copy — должен копировать файл resourceFileName на место destinationFileName.
+ГЛАВНОЕ УСЛОВИЕ:
+
+Никаких других импортов!
+*/
+public class Solution {
+    public static byte[] readBytes(String fileName) throws IOException {
+
+        return Files.readAllBytes(Paths.get(fileName));
+    }
+
+    public static List<String> readLines(String fileName) throws IOException {
+        return Files.readAllLines(Paths.get(fileName));
+    }
+
+    public static void writeBytes(String fileName, byte[] bytes) throws IOException {
+        Files.write(Paths.get(fileName),bytes);
+    }
+
+    public static void copy(String resourceFileName, String destinationFileName) throws IOException {
+        Files.copy(Paths.get(resourceFileName),Paths.get(destinationFileName));
+    }
+}
+
+package com.javarush.task.task31.task3102;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
+/* 
+Находим все файлы
+Реализовать логику метода getFileTree, который должен в директории root найти список всех файлов включая вложенные.
+Используй очередь, рекурсию не используй.
+Верни список всех путей к найденным файлам, путь к директориям возвращать не надо.
+Путь должен быть абсолютный.
+*/
+public class Solution {
+    public static List<String> getFileTree(String root) throws IOException {
+        File rootDir = new File(root);
+        List<String> result = new ArrayList<>();
+        Queue<File> fileTree = new PriorityQueue<>();
+
+        Collections.addAll(fileTree, rootDir.listFiles());
+
+        while (!fileTree.isEmpty())
+        {
+            File currentFile = fileTree.remove();
+
+            if(currentFile.isDirectory()){
+                Collections.addAll(fileTree, currentFile.listFiles());
+            } else {
+                result.add(currentFile.getAbsolutePath());
+            }
+        }
+        for (String s : result
+             ) {
+            System.out.println(s);
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        try {
+            getFileTree("C:\\Idea\\JavaRushTasks\\4.JavaCollections");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+
+package com.javarush.task.task31.task3104;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
+/* 
+Поиск скрытых файлов
+В классе Solution переопредели логику двух методов:
+— visitFile кроме своей логики должен добавлять в archived все пути к zip и rar файлам
+— visitFileFailed должен добавлять в failed все пути к недоступным файлам и возвращать SKIP_SUBTREE
+
+Пример вывода:
+D:/mydir/BCD.zip
+
+Метод main не участвует в тестировании
+*/
+public class Solution extends SimpleFileVisitor<Path> {
+    private List<String> archived = new ArrayList<>();
+    private List<String> failed = new ArrayList<>();
+
+    public static void main(String[] args) throws IOException {
+        EnumSet<FileVisitOption> options = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+        final Solution solution = new Solution();
+        Files.walkFileTree(Paths.get("D:\\"), options, 20, solution);
+
+        List<String> result = solution.getArchived();
+        System.out.println("All archived files:");
+        for (String path : result) {
+            System.out.println("\t" + path);
+        }
+
+        List<String> failed = solution.getFailed();
+        System.out.println("All failed files:");
+        for (String path : failed) {
+            System.out.println("\t" + path);
+        }
+    }
+
+    @Override
+    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+         FileVisitResult result = super.visitFile(file, attrs);
+        if (file.toString().endsWith(".rar") || file.toString().endsWith(".zip")) {
+            archived.add (file.toString());
+        }
+        return result;
+    }
+
+    @Override
+    public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+        failed.add(file.toString());
+       return FileVisitResult.SKIP_SUBTREE;
+    }
+    public List<String> getArchived() {
+        return archived;
+    }
+
+    public List<String> getFailed() {
+        return failed;
+    }
+}
+
+package com.javarush.task.task31.task3106;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.SequenceInputStream;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
+/*
+Разархивируем файл
+Разархивируем файл
+В метод main приходит список аргументов.
+Первый аргумент — имя результирующего файла resultFileName, остальные аргументы — имена файлов fileNamePart.
+Каждый файл (fileNamePart) — это кусочек zip архива. Нужно разархивировать целый файл, собрав его из кусочков.
+Записать разархивированный файл в resultFileName.
+Архив внутри может содержать файл большой длины, например, 50Mb.
+Внутри архива может содержаться файл с любым именем.
+
+Пример входных данных. Внутри архива находится один файл с именем abc.mp3:
+C:/result.mp3
+C:/pathToTest/test.zip.003
+C:/pathToTest/test.zip.001
+C:/pathToTest/test.zip.004
+C:/pathToTest/test.zip.002
+
+
+Требования:
+1. В методе main нужно создать ZipInputStream для архива, собранного из кусочков файлов. Файлы приходят аргументами в main, начиная со второго.
+2. Создай поток для записи в файл, который приходит первым аргументом в main. Запиши туда содержимое файла из архива.
+3. Поток для чтения из архива должен быть закрыт.
+4. Поток для записи в файл должен быть закрыт.
+*/
+public class Solution
+{
+    public static void main(String[] args) throws IOException
+    {
+        if (args.length < 2) return;
+
+        String resultFileName = args[0];
+        int filePartCount = args.length - 1;
+        String[] fileNamePart = new String[filePartCount];
+        for (int i = 0; i < filePartCount; i++)
+        {
+            fileNamePart[i] = args[i + 1];
+        }
+        Arrays.sort(fileNamePart);
+
+        List<FileInputStream> fisList = new ArrayList<>();
+        for (int i = 0; i < filePartCount; i++)
+        {
+            fisList.add(new FileInputStream(fileNamePart[i]));
+        }
+        SequenceInputStream seqInStream = new SequenceInputStream(Collections.enumeration(fisList));
+        ZipInputStream zipInStream = new ZipInputStream(seqInStream);
+        FileOutputStream fileOutStream = new FileOutputStream(resultFileName);
+        byte[] buf = new byte[1024 * 1024];
+        while (zipInStream.getNextEntry() != null)
+        {
+            int count;
+            while ((count = zipInStream.read(buf)) != -1)
+            {
+                fileOutStream.write(buf, 0, count);
+            }
+        }
+        seqInStream.close();
+        zipInStream.close();
+        fileOutStream.close();
+    }
+}
+
+package com.javarush.task.task31.task3105;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
+/*
+Добавление файла в архив
+В метод main приходит список аргументов.
+Первый аргумент — полный путь к файлу fileName.
+Второй аргумент — путь к zip-архиву.
+Добавить файл (fileName) внутрь архива в директорию ‘new‘.
+Если в архиве есть файл с таким именем, то заменить его.
+
+Пример входных данных:
+C:/result.mp3
+C:/pathToTest/test.zip
+
+Файлы внутри test.zip:
+a.txt
+b.txt
+
+После запуска Solution.main архив test.zip должен иметь такое содержимое:
+new/result.mp3
+a.txt
+b.txt
+
+Подсказка: нужно сначала куда-то сохранить содержимое всех энтри, а потом записать в архив все энтри вместе с добавленным файлом.
+Пользоваться файловой системой нельзя.
+
+
+Требования:
+1. В методе main создай ZipInputStream для архивного файла (второй аргумент main). Нужно вычитать из него все содержимое.
+2. В методе main создай ZipOutputStream для архивного файла (второй аргумент main).
+3. В ZipOutputStream нужно записать содержимое файла, который приходит первым аргументом в main.
+4. В ZipOutputStream нужно записать все остальное содержимое, которое было вычитано из ZipInputStream.
+5. Потоки для работы с архивом должны быть закрыты.
+*/
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        String fileName = args[0];
+        String zipFileName = args[1];
+        File file = new File(fileName);
+
+        Map<String, ByteArrayOutputStream> archivedFiles = new HashMap<>();
+        try (ZipInputStream zipReader = new ZipInputStream(new FileInputStream(zipFileName))) {
+            ZipEntry entry;
+            while ((entry = zipReader.getNextEntry()) != null) {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int count = 0;
+                while ((count = zipReader.read(buffer)) != -1)
+                    byteArrayOutputStream.write(buffer, 0, count);
+
+                archivedFiles.put(entry.getName(), byteArrayOutputStream);
+            }
+        }
+
+        try (ZipOutputStream zipWriter = new ZipOutputStream(new FileOutputStream(zipFileName))) {
+            for (Map.Entry<String, ByteArrayOutputStream> pair : archivedFiles.entrySet()) {
+                if (pair.getKey().substring(pair.getKey().lastIndexOf("/") + 1).equals(file.getName())) continue;
+                zipWriter.putNextEntry(new ZipEntry(pair.getKey()));
+                zipWriter.write(pair.getValue().toByteArray());
+            }
+
+            ZipEntry zipEntry = new ZipEntry("new/" + file.getName());
+            zipWriter.putNextEntry(zipEntry);
+            Files.copy(file.toPath(), zipWriter);
+        }
+    }
+}
+
+package com.javarush.task.task31.task3112;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+/* 
+Загрузчик файлов
+Реализуй метод downloadFile(String urlString, Path downloadDirectory), на вход которого подается ссылка для скачивания файла и папка, куда нужно закачать файл.
+Все ссылки имеют вид:
+https://yastatic.net/morda-logo/i/citylogos/yandex19-logo-ru.png
+http://toogle.com/files/rules.txt
+https://pacemook.com/photos/image1.jpg
+
+Метод должен создать объект URL и загрузить содержимое файла на локальный диск.
+Выкачивай сначала во временную директорию, чтобы в случае неуспешной загрузки в твоей директории не оставались недокачанные файлы.
+Затем перемести файл в пользовательскую директорию. Имя для файла возьми из ссылки.
+Используй только классы и методы из пакета java.nio.
+
+https://www.amigo.com/ship/secretPassword.txt
+Требования:
+1. Метод downloadFile должен создавать объект URL для переданной ссылки.
+2. Метод downloadFile должен создать временный файл с помощью метода Files.createTempFile.
+3. Метод downloadFile должен скачать файл по ссылке во временный файл, используя метод Files.copy.
+4. Метод downloadFile должен переместить файл из временной директории в пользовательскую, используя метод Files.move.
+5. Имя сохраненного файла должно быть таким же, как в URL-ссылке.
+*/
+public class Solution {
+
+    public static void main(String[] args) throws IOException {
+        Path passwords = downloadFile("https://www.amigo.com/ship/secretPassword.txt", Paths.get("D:/MyDownloads"));
+
+        for (String line : Files.readAllLines(passwords)) {
+            System.out.println(line);
+        }
+    }
+
+    public static Path downloadFile(String urlString, Path downloadDirectory) throws IOException {
+        // implement this method
+        URL url = new URL(urlString);
+        InputStream stream = url.openStream();
+//        Path file = Paths.get(url.getFile());
+
+        Path temp = Files.createTempFile("temp",".temp");
+        Files.copy(stream,temp);
+
+        String name=urlString.substring(urlString.lastIndexOf("/"));
+        System.out.println(name);
+        Path file_new = Paths.get(downloadDirectory+"/"+name);
+        Files.move(temp,file_new);
+        return file_new;
+    }
+}
+
+package com.javarush.task.task31.task3108;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+/* 
+Исследуем Path
+Почитай про все методы класса Path.
+Найди такой, который создает относительный путь между текущим и переданным путем.
+Реализуй логику метода getDiffBetweenTwoPaths, он должен возвращать относительный путь.
+Метод main не участвует в тестировании.
+*/
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        Path path1 = Paths.get("D:/test/data/firstDir");
+        Path path2 = Paths.get("D:/test/data/secondDir/third");
+        Path resultPath = getDiffBetweenTwoPaths(path1, path2);
+        System.out.println(resultPath);   //expected output '../secondDir/third' or '..\secondDir\third'
+    }
+
+    public static Path getDiffBetweenTwoPaths(Path path1, Path path2) {
+        return path1.relativize(path2);
+    }
+}
+
+package com.javarush.task.task31.task3113;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+
+import static java.nio.file.FileVisitResult.CONTINUE;
+
+/*
+Что внутри папки?
+Напиши программу, которая будет считать подробную информацию о папке и выводить ее на консоль.
+
+Первым делом считай путь к папке с консоли.
+Если введенный путь не является директорией — выведи «[полный путь] — не папка» и заверши работу.
+Затем посчитай и выведи следующую информацию:
+
+Всего папок — [количество папок в директории]
+Всего файлов — [количество файлов в директории и поддиректориях]
+Общий размер — [общее количество байт, которое хранится в директории]
+
+Используй только классы и методы из пакета java.nio.
+
+Квадратные скобки [ ] выводить на экран не нужно.
+
+
+Требования:
+1. Метод main должен считывать путь к папке с консоли.
+2. Если введенный путь не является директорией - нужно вывести "[полный путь] - не папка" и завершить работу.
+3. На консоль должна быть выведена следующая информация: "Всего папок - [количество папок в директории]".
+4. На консоль должна быть выведена следующая информация: "Всего файлов - [количество файлов в директории и поддиректориях]".
+5. На консоль должна быть выведена следующая информация: "Общий размер - [общее количество байт, которое хранится в директории]".
+*/
+public class Solution {
+    static long totalFolders = 0;
+    static long totalFiles = 0;
+    static long totalSize = 0;
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader conReader = new BufferedReader(new InputStreamReader(System.in));
+        String pathStr = conReader.readLine();
+        conReader.close();
+
+        Path pth = Paths.get(pathStr);
+
+        if (!Files.isDirectory(pth)) {
+            System.out.printf(pth.toAbsolutePath().toString() + " - не папка");
+            return;
+        }
+
+        Files.walkFileTree(pth, new Visitior());
+
+        System.out.println("Всего папок - " + (totalFolders-1));
+        System.out.println("Всего файлов - " + totalFiles);
+        System.out.println("Общий размер - " + totalSize);
+
+    }
+
+    private static class Visitior extends SimpleFileVisitor<Path> {
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            totalFolders += 1;
+            return CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            totalFiles += 1;
+            totalSize = totalSize + attrs.size();
+            return CONTINUE;
+        }
+    }
+}
+
+package com.javarush.task.task32.task3202;
+
+import java.io.*;
+
+/* 
+Читаем из потока
+Реализуй логику метода getAllDataFromInputStream. Он должен вернуть StringWriter, содержащий все данные из переданного потока.
+Возвращаемый объект ни при каких условиях не должен быть null.
+Метод main не участвует в тестировании.
+*/
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        StringWriter writer = getAllDataFromInputStream(new FileInputStream("testFile.log"));
+        System.out.println(writer.toString());
+    }
+
+    public static StringWriter getAllDataFromInputStream(InputStream is) throws IOException {
+
+        if (is == null) return new StringWriter();
+        StringWriter swriter = new StringWriter();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        swriter.write(reader.readLine());
+        swriter.flush();
+        reader.close();
+        swriter.close();
+        return swriter;
+    }
+}
+
+package com.javarush.task.task32.task3203;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+/*
+Пишем стек-трейс
+Реализуй логику метода getStackTrace, который в виде одной строки (одного объекта типа String) должен возвращать весь стек-трейс переданного исключения.
+Используй подходящий метод класса Throwable, который поможет записать стек-трейс в StringWriter.
+Метод main не участвует в тестировании.
+
+
+Требования:
+1. Публичный статический метод String getStackTrace (Throwable) должен существовать.
+2. В методе getStackTrace необходимо создать объект типа StringWriter.
+3. В методе getStackTrace (Throwable) необходимо использовать метод класса Throwable, который принимает объект типа PrintWriter.
+4. Метод getStackTrace (Throwable) должен возвращать весь стек-трейс переданного исключения.
+*/
+public class Solution {
+    public static void main(String[] args) {
+        String text = getStackTrace(new IndexOutOfBoundsException("fff"));
+        System.out.println(text);
+    }
+
+    public static String getStackTrace(Throwable throwable) {
+        StringWriter writer = new StringWriter();
+        throwable.printStackTrace(new PrintWriter(writer));
+
+        return writer.toString();
+    }
+}
+
+package com.javarush.task.task32.task3213;
+
+import java.io.IOException;
+import java.io.StringReader;
+
+/* 
+Шифр Цезаря
+
+Привет Амиго. Ты знаешь, за нами следят, просматривают нашу переписку. Поэтому нужно шифровать трафик.
+Для тебя не составит труда реализовать шифр Цезаря, напомню что это просто сдвиг вправо по алфавиту на key букв.
+В методе main есть хороший пример.
+
+Реализуй логику метода String decode(StringReader reader, int key).
+Метод получает данные в закодированном виде.
+Он должен вернуть дешифрованную строку, что хранится в StringReader — е.
+Возвращаемый объект ни при каких условиях не должен быть null.
+Метод main не участвует в тестировании.
+
+
+Требования:
+1. Класс Solution должен содержать метод String decode(StringReader reader, int key).
+2. Метод decode(StringReader reader, int key) должен вернуть дешифрованную строку что хранится в StringReader - е.
+3. Возвращаемый объект ни при каких условиях не должен быть null.
+*/
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        StringReader reader = new StringReader("Khoor Dpljr");
+        System.out.println(decode(reader, -3));  //Hello Amigo
+
+    }
+
+    public static String decode(StringReader reader, int key) throws IOException {
+        //       System.out.println(reader.toString());
+        if (reader==null) return new String();
+        StringBuilder decode = new StringBuilder();
+        int c;
+        while ((c = reader.read()) != -1) {
+
+            decode.append((char)(c + key));
+        }
+            return decode.toString();
+        }
+    }
+
+
+package com.javarush.task.task32.task3204;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+//import org.apache.commons.lang3.RandomStringUtils;
+
+
+/* 
+Генератор паролей
+Реализуй логику метода getPassword, который должен возвращать ByteArrayOutputStream, в котором будут байты пароля.
+Требования к паролю:
+1) 8 символов.
+2) только цифры и латинские буквы разного регистра.
+3) обязательно должны присутствовать цифры, и буквы разного регистра.
+Все сгенерированные пароли должны быть уникальные.
+
+Пример правильного пароля:
+wMh7smNu
+
+
+Требования:
+1. Класс Solution должен содержать метод getPassword(), который возвращает ByteArrayOutputStream со сгенерированным паролем.
+2. Длина пароля должна составлять 8 символов.
+3. Пароль должен содержать хотя бы одну цифру.
+4. Пароль должен содержать хотя бы одну латинскую букву нижнего регистра.
+5. Пароль должен содержать хотя бы одну латинскую букву верхнего регистра.
+6. Пароль не должен содержать других символов, кроме цифр и латинских букв разного регистра.
+7. Сгенерированные пароли должны быть уникальными.
+*/
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        ByteArrayOutputStream password = getPassword();
+        System.out.println(password.toString());
+    }
+
+    public static ByteArrayOutputStream getPassword() throws IOException {
+
+        StringBuilder builder = new StringBuilder();
+        String s1 = "abcdefghijklmnopqrstuvwxyz";
+        String s2 = "1234567890";
+
+        for (int i=0; i<4; i++) {
+            builder.append(s1.charAt((int)(Math.random()*26)));
+        }
+        for (int i=0; i<2; i++) {
+            builder.append(s2.charAt((int)(Math.random()*10)));
+        }
+        for (int i=0; i<2; i++) {
+            builder.append(s1.toUpperCase().charAt((int)(Math.random()*26)));
+        }
+
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        byteStream.write(builder.toString().getBytes());
+        byteStream.flush();
+        byteStream.close();
+        return byteStream;
+    }
+}
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        ByteArrayOutputStream password = getPassword();
+        System.out.println(password.toString());
+    }
+
+    public static ByteArrayOutputStream getPassword() throws IOException {
+        char[] c = {'a','s','d','f','g','h','j','k','l','q','w','e','r','t','y','u','i','o','p','z','x','c','v','b','n','m'};
+        StringBuilder builder = new StringBuilder();
+
+        String s1 = RandomStringUtils.randomNumeric(1);
+        String s2 = RandomStringUtils.random(1,c).toUpperCase();
+        String s3 = RandomStringUtils.random(6,c);
+        String string = s1+s2+s3;
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        byteStream.write(string.getBytes());
+
+        byteStream.flush();
+        byteStream.close();
+        return byteStream;
+    }
+}
+package com.javarush.task.task33.task3312;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/* 
+Сериализация зоопарка
+Сделай так, чтобы при сериализации объекта типа Zoo, каждому элементу списка animals был добавлен тип (dog для класса Dog, cat для класса Cat).
+Для проверки можешь использовать метод main класса Solution.
+
+Было:
+{"animals":[{"name":"doggy","barkVolume":0.0},{"name":"catty","lives":0}]}
+
+Должно стать:
+{"animals":[{"type":"dog","name":"doggy","barkVolume":0.0},{"type":"cat","name":"catty","lives":0}]}
+
+
+Требования:
+1. Класс Zoo.Animal должен быть отмечен аннотацией @JsonTypeInfo.
+2. Класс Zoo.Animal должен быть отмечен аннотацией @JsonSubTypes.
+3. Класс Zoo.Dog должен быть отмечен аннотацией @JsonTypeName.
+4. Класс Zoo.Cat должен быть отмечен аннотацией @JsonTypeName.
+5. При сериализации в JSON всем объектам списка animals должен быть добавлен тип и сохранен основной формат (пример в задании).
+*/
+public class Solution {
+    public static void main(String[] args) throws JsonProcessingException {
+        Zoo.Dog dog = new Zoo.Dog("doggy");
+        Zoo.Cat cat = new Zoo.Cat("catty");
+        Zoo zoo = new Zoo();
+        zoo.animals.add(dog);
+        zoo.animals.add(cat);
+
+        String result = new ObjectMapper().writeValueAsString(zoo);
+
+        System.out.println(result);
+    }
+}
+package com.javarush.task.task33.task3312;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Zoo {
+    public List<Animal> animals = new ArrayList<>();
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = Dog.class, name = "dog"),
+            @JsonSubTypes.Type(value = Cat.class, name = "cat")
+    })
+
+    public static class Animal {
+        public Animal(String name) {
+            this.name = name;
+        }
+
+        public String name;
+    }
+    @JsonTypeName(value = "dog")
+    public static class Dog extends Animal {
+
+        public double barkVolume;
+
+        public Dog(String name) {
+            super(name);
+        }
+    }
+    @JsonTypeName(value = "cat")
+    public static class Cat extends Animal {
+        boolean likesCream;
+        public int lives;
+
+        public Cat(String name) {
+            super(name);
+        }
+    }
+}
+
+package com.javarush.task.task33.task3313;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/* 
+Сериализация даты в JSON
+Используя аннотацию JsonFormat сделай так, чтобы поле содержащее дату в классе Event сериализировалось в формате (dd-MM-yyyy hh:mm:ss).
+
+Требования:
+1. Поле eventDate в классе Event должно быть отмечено аннотацией @JsonFormat.
+2. Объекты типа Event должны корректно сериализовываться в JSON в соответствии с условием задачи.
+3. В конструкторе класса Event должен быть создан новый объект типа Date без аргументов.
+4. Поле eventDate должно быть публичным.
+*/
+public class Solution {
+    public static void main(String[] args) throws JsonProcessingException {
+        Event event = new Event("event#1");
+
+        String result = new ObjectMapper().writeValueAsString(event);
+
+        System.out.println(result);
+    }
+}
+package com.javarush.task.task33.task3313;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
+
+public class Event {
+    public String name;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+    public Date eventDate;
+
+    public Event(String name) {
+        this.name = name;
+        eventDate = new Date();
+    }
+}
+
+package com.javarush.task.task33.task3306;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import java.io.IOException;
+import java.io.StringWriter;
+
+/* 
+Первая сериализация в XML
+Расставь правильно JAXB аннотации у статических классов.
+
+
+Требования:
+1. Класс Cat должен быть отмечен аннотацией @XmlRootElement.
+2. Класс Cat должен быть отмечен аннотацией @XmlType с параметром name = "cat".
+3. Класс Dog должен быть отмечен аннотацией @XmlRootElement.
+4. Класс Dog должен быть отмечен аннотацией @XmlType с параметром name = "dog".
+*/
+public class Solution {
+    public static void main(String[] args) throws IOException, JAXBException {
+        Cat cat = new Cat();
+        cat.name = "Murka";
+        cat.age = 5;
+        cat.weight = 3;
+
+        Dog dog = new Dog();
+        dog.name = "Killer";
+        dog.age = 8;
+        dog.owner = "Bill Jeferson";
+
+        StringWriter writer = new StringWriter();
+        convertToXml(writer, cat);
+        convertToXml(writer, dog);
+        System.out.println(writer.toString());
+        /* expected output
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cat>
+    <name>Murka</name>
+    <age>5</age>
+    <weight>3</weight>
+</cat>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dog>
+    <name>Killer</name>
+    <age>8</age>
+    <owner>Bill Jeferson</owner>
+</dog>
+        */
+    }
+
+    public static void convertToXml(StringWriter writer, Object obj) throws IOException, JAXBException {
+        JAXBContext context = JAXBContext.newInstance(obj.getClass());
+        Marshaller marshaller = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.marshal(obj, writer);
+    }
+
+    public static class Pet {
+        public String name;
+    }
+@XmlRootElement
+@XmlType(name = "cat")
+    public static class Cat extends Pet {
+        public int age;
+        public int weight;
+    }
+@XmlRootElement
+@XmlType(name = "dog")
+    public static class Dog extends Pet {
+        public int age;
+        public String owner;
+    }
+}
+
+package com.javarush.task.task33.task3307;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
+import java.io.StringReader;
+
+/* 
+Десериализация XML объекта
+В метод convertFromXmlToNormal первым параметром приходит строка, содержащая xml объект.
+Вторым параметром приходит класс, объект которого необходимо вернуть.
+Метод convertFromXmlToNormal должен создать объект из xml-строки и вернуть его.
+
+
+Требования:
+1. В методе convertFromXmlToNormal должен быть создан новый объект типа JAXBContext с помощью статического метода JAXBContext.newInstance, в качестве параметра используй целевой класс.
+2. В методе convertFromXmlToNormal должен быть создан новый объект типа Unmarshaller с помощью метода createUnmarshaller вызванного на объекте типа JAXBContext.
+3. Метод convertFromXmlToNormal должен корректно преобразовывать входящую xml строку в объект требуемого класса.
+4. Метод convertFromXmlToNormal должен быть статическим.
+*/
+public class Solution {
+    public static void main(String[] args) throws IOException, JAXBException {
+        String xmlData = "<cat><name>Murka</name><age>5</age><weight>4</weight></cat>";
+        Cat cat = convertFromXmlToNormal(xmlData, Cat.class);
+        System.out.println(cat);
+    }
+
+    public static <T> T convertFromXmlToNormal(String xmlData, Class<T> clazz) throws IOException, JAXBException {
+        JAXBContext context = JAXBContext.newInstance(clazz);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        T cat = (T) unmarshaller.unmarshal(new StringReader(xmlData));
+        return cat;
+    }
+
+    @XmlType(name = "cat")
+    @XmlRootElement
+    public static class Cat {
+        public String name;
+        public int age;
+        public int weight;
+
+        @Override
+        public String toString() {
+            return "Cat{" +
+                    "name='" + name + '\'' +
+                    ", age=" + age +
+                    ", weight=" + weight +
+                    '}';
+        }
+    }
+}
+
+package com.javarush.task.task33.task3308;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.StringReader;
+
+/* 
+Создание класса по строке xml
+Восстанови класс по переданной строке xml.
+Класс должен быть в отдельном файле.
+Метод getClassName должен возвращать восстановленный класс.
+Метод main не участвует в тестировании.
+
+
+Требования:
+1. Класс Shop должен быть создан в отдельном файле.
+2. В классе Shop должно быть создано поле goods типа Goods.
+3. В классе Shop должно быть создано поле count типа int.
+4. В классе Shop должно быть создано поле profit типа double.
+5. В классе Shop должен быть создан массив строк secretData.
+6. В классе Shop должен содержаться вложенный статический класс Goods.
+7. В классе Shop.Goods должен быть создан список строк names.
+8. Все поля класса Shop должны быть публичными.
+9. Метод getClassName класса Solution должен возвращать класс Shop.
+*/
+public class Solution {
+    public static void main(String[] args) throws JAXBException {
+        String xmlData =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                        "<shop>\n" +
+                        "    <goods>\n" +
+                        "        <names>S1</names>\n" +
+                        "        <names>S2</names>\n" +
+                        "    </goods>\n" +
+                        "    <count>12</count>\n" +
+                        "    <profit>123.4</profit>\n" +
+                        "    <secretData>String1</secretData>\n" +
+                        "    <secretData>String2</secretData>\n" +
+                        "    <secretData>String3</secretData>\n" +
+                        "    <secretData>String4</secretData>\n" +
+                        "    <secretData>String5</secretData>\n" +
+                        "</shop>";
+
+        StringReader reader = new StringReader(xmlData);
+
+        JAXBContext context = JAXBContext.newInstance(getClassName());
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+
+        Shop o = (Shop) unmarshaller.unmarshal(reader);
+
+        System.out.println(o.toString());
+    }
+
+    public static Class getClassName() {
+        return new Shop().getClass();  //your class name
+    }
+}
+package com.javarush.task.task33.task3308;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
+
+@XmlType(name = "shop")
+@XmlRootElement
+public class Shop {
+    public Goods goods;
+    public int count;
+    public double profit;
+    public String[] secretData;
+
+    //В классе Shop.Goods должен быть создан список строк names.
+
+    public static class Goods {
+        public List<String> names = new ArrayList<>();
+
+        @Override
+        public String toString() {
+            String to = "goods";
+            for (String s: names
+                 ) {
+                to =to +" "+s;
+            }
+            return to;
+        }
+    }
+
+    @Override
+    public String toString() {
+        String to = goods.toString()+" count :" + count + ", profit : "+profit + ", secret : ";
+        for (String s: secretData
+             ) {
+            to = to + " secretData "+s;
+        }
+        return to;
+    }
+}
+
+package com.javarush.task.task33.task3309;
+
+import com.javarush.task.task33.task3308.Shop;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.IOException;
+import java.io.StringWriter;
+
+/*
+Комментарий внутри xml
+ДОДЕЛАТЬ
+Реализовать метод toXmlWithComment, который должен возвращать строку — xml представление объекта obj.
+В строке перед каждым тегом tagName должен быть вставлен комментарий comment.
+Сериализация obj в xml может содержать CDATA с искомым тегом. Перед ним вставлять комментарий не нужно.
+
+Пример вызова:
+toXmlWithComment(firstSecondObject, «second», «it’s a comment»)
+
+Пример результата:
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<first>
+<!--it's a comment-->
+<second>some string</second>
+<!--it's a comment-->
+<second>some string</second>
+<!--it's a comment-->
+<second><![CDATA[need CDATA because of < and >]]></second>
+<!--it's a comment-->
+<second/>
+</first>
+
+
+Требования:
+1. Количество комментариев вставленных в xml должно быть равно количеству тегов tagName.
+2. Метод toXmlWithComment должен возвращать xml в виде строки преобразованной в соответствии с условием задачи.
+3. Метод toXmlWithComment не должен изменять входящий xml в случае, если искомый тег отсутствует в нём.
+4. Метод toXmlWithComment должен быть статическим.
+5. Метод toXmlWithComment должен быть публичным.
+*/
+public class Solution {
+    public static String toXmlWithComment(Object obj, String tagName, String comment) throws IOException, JAXBException{
+        //писать результат сериализации будем в Writer(StringWriter)
+        StringWriter writer = new StringWriter();
+
+        //создание объекта Marshaller, который выполняет сериализацию
+        JAXBContext context = JAXBContext.newInstance(obj.getClass());
+        Marshaller marshaller = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        // сама сериализация
+        marshaller.marshal(obj, writer);
+
+        //преобразовываем в строку все записанное в StringWriter
+        String result = writer.toString();
+ //       System.out.println(result);
+        return result;
+    }
+
+    public static void main(String[] args) throws IOException, JAXBException {
+        Shop shop = new Shop();
+        shop.count = 1;
+        shop.profit = 123.1;
+        shop.secretData = new String[2];
+        shop.secretData[0]= "qwe";
+        shop.secretData[1] = "lkjedl";
+        shop.goods.names.add("good 1");
+        shop.goods.names.add("good 2");
+        System.out.println(toXmlWithComment(shop,"goods","comment"));
+    }
+}
+package com.javarush.task.task33.task3308;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
+
+@XmlType(name = "shop")
+@XmlRootElement
+public class Shop {
+    public Goods goods = new Goods();
+    public int count;
+    public double profit;
+    public String[] secretData;
+
+    //В классе Shop.Goods должен быть создан список строк names.
+
+    public static class Goods {
+        public List<String> names = new ArrayList<>();
+
+        @Override
+        public String toString() {
+            String to = "goods";
+            for (String s: names
+                 ) {
+                to =to +" "+s;
+            }
+            return to;
+        }
+    }
+
+    @Override
+    public String toString() {
+        String to = goods.toString()+" count :" + count + ", profit : "+profit + ", secret : ";
+        for (String s: secretData
+             ) {
+            to = to + " secretData "+s;
+        }
+        return to;
+    }
+}
+
+package com.javarush.task.task25.task2515;
+
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Главный класс игры - Космос (Space)
+ */
+public class Space {
+    //Ширина и высота игрового поля
+    private int width;
+    private int height;
+
+    //Космический корабль
+    private SpaceShip ship;
+    //Список НЛО
+    private ArrayList<Ufo> ufos = new ArrayList<Ufo>();
+    //Список бомб
+    private ArrayList<Bomb> bombs = new ArrayList<Bomb>();
+    //Список ракет
+    private ArrayList<Rocket> rockets = new ArrayList<Rocket>();
+
+    public Space(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    /**
+     * Основной цикл программы.
+     * Тут происходят все важные действия
+     */
+    public void run() {
+        //Создаем холст для отрисовки.
+        Canvas canvas = new Canvas(width, height);
+
+        //Создаем объект "наблюдатель за клавиатурой" и стартуем его.
+        KeyboardObserver keyboardObserver = new KeyboardObserver();
+        keyboardObserver.start();
+
+        //Игра работает, пока корабль жив
+        while (ship.isAlive()) {
+            //"наблюдатель" содержит события о нажатии клавиш?
+            if (keyboardObserver.hasKeyEvents()) {
+                KeyEvent event = keyboardObserver.getEventFromTop();
+                //Если "стрелка влево" - сдвинуть фигурку влево
+                System.out.print(event.getKeyCode());
+                if (event.getKeyCode() == KeyEvent.VK_LEFT)
+                    ship.moveLeft();
+                    //Если "стрелка вправо" - сдвинуть фигурку вправо
+                else if (event.getKeyCode() == KeyEvent.VK_RIGHT)
+                    ship.moveRight();
+                    //Если "пробел" - запускаем шарик
+                else if (event.getKeyCode() == KeyEvent.VK_SPACE)
+                    ship.fire();
+            }
+
+            //двигаем все объекты игры
+            moveAllItems();
+
+            //проверяем столкновения
+            checkBombs();
+            checkRockets();
+            //удаляем умершие объекты из списков
+            removeDead();
+
+            //Создаем НЛО (1 раз в 10 ходов)
+            createUfo();
+
+            //Отрисовываем все объекты на холст, а холст выводим на экран
+            canvas.clear();
+            draw(canvas);
+            canvas.print();
+
+            //Пауза 300 миллисекунд
+            Space.sleep(300);
+        }
+
+        //Выводим сообщение "Game Over"
+        System.out.println("Game Over!");
+    }
+
+    /**
+     * Двигаем все объекты игры
+     */
+    public void moveAllItems() {
+        for (BaseObject object : getAllItems()) {
+            object.move();
+        }
+    }
+
+    /**
+     * Метод возвращает общий список, который содержит все объекты игры
+     */
+    public List<BaseObject> getAllItems() {
+        ArrayList<BaseObject> list = new ArrayList<BaseObject>(ufos);
+        list.add(ship);
+        list.addAll(bombs);
+        list.addAll(rockets);
+        return list;
+    }
+
+    /**
+     * Создаем новый НЛО. 1 раз на 10 вызовов.
+     */
+    public void createUfo() {
+        if (ufos.size() > 0) return;
+
+        int random10 = (int) (Math.random() * 10);
+        if (random10 == 0) {
+            double x = Math.random() * width;
+            double y = Math.random() * height / 2;
+            ufos.add(new Ufo(x, y));
+        }
+    }
+
+    /**
+     * Проверяем бомбы.
+     * а) столкновение с кораблем (бомба и корабль умирают)
+     * б) падение ниже края игрового поля (бомба умирает)
+     */
+    public void checkBombs() {
+        for (Bomb bomb : bombs) {
+            if (ship.isIntersect(bomb)) {
+                ship.die();
+                bomb.die();
+            }
+
+            if (bomb.getY() >= height)
+                bomb.die();
+        }
+    }
+
+    /**
+     * Проверяем рокеты.
+     * а) столкновение с НЛО (ракета и НЛО умирают)
+     * б) вылет выше края игрового поля (ракета умирает)
+     */
+    public void checkRockets() {
+        for (Rocket rocket : rockets) {
+            for (Ufo ufo : ufos) {
+                if (ufo.isIntersect(rocket)) {
+                    ufo.die();
+                    rocket.die();
+                }
+            }
+
+            if (rocket.getY() <= 0)
+                rocket.die();
+        }
+    }
+
+    /**
+     * Удаляем умерсшие объекты (бомбы, ракеты, НЛО) из списков
+     */
+    public void removeDead() {
+        for (BaseObject object : new ArrayList<BaseObject>(bombs)) {
+            if (!object.isAlive())
+                bombs.remove(object);
+        }
+
+        for (BaseObject object : new ArrayList<BaseObject>(rockets)) {
+            if (!object.isAlive())
+                rockets.remove(object);
+        }
+
+        for (BaseObject object : new ArrayList<BaseObject>(ufos)) {
+            if (!object.isAlive())
+                ufos.remove(object);
+        }
+    }
+
+    /**
+     * Отрисовка всех объектов игры:
+     * а) заполняем весь холст точесками.
+     * б) отрисовываем все объекты на холст.
+     */
+    public void draw(Canvas canvas) {
+        //draw game
+        for (int i = 0; i < width + 2; i++) {
+            for (int j = 0; j < height + 2; j++) {
+                canvas.setPoint(i, j, '.');
+            }
+        }
+
+        for (int i = 0; i < width + 2; i++) {
+            canvas.setPoint(i, 0, '-');
+            canvas.setPoint(i, height + 1, '-');
+        }
+
+        for (int i = 0; i < height + 2; i++) {
+            canvas.setPoint(0, i, '|');
+            canvas.setPoint(width + 1, i, '|');
+        }
+
+        for (BaseObject object : getAllItems()) {
+            object.draw(canvas);
+        }
+    }
+
+
+    public SpaceShip getShip() {
+        return ship;
+    }
+
+    public void setShip(SpaceShip ship) {
+        this.ship = ship;
+    }
+
+    public ArrayList<Ufo> getUfos() {
+        return ufos;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public ArrayList<Bomb> getBombs() {
+        return bombs;
+    }
+
+    public ArrayList<Rocket> getRockets() {
+        return rockets;
+    }
+
+    public static Space game;
+
+    public static void main(String[] args) throws Exception {
+        game = new Space(20, 20);
+        game.setShip(new SpaceShip(10, 18));
+        game.run();
+    }
+
+    /**
+     * Метод делает паузу длинной delay миллисекунд.
+     */
+    public static void sleep(int delay) {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+        }
+    }
+}
+package com.javarush.task.task25.task2515;
+
+/**
+ * Базовый класс для всех объектов игры.
+ */
+public abstract class BaseObject {
+    //координаты
+    protected double x;
+    protected double y;
+    //радиус объекта
+    protected double radius;
+    //состояние объект - жив ли объект
+    private boolean isAlive;
+
+    public BaseObject(double x, double y, double radius) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.isAlive = true;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    /**
+     * Метод рисует свой объект на "канвасе".
+     */
+    public void draw(Canvas canvas) {
+        //do nothing
+    }
+
+    /**
+     * Двигаем себя на один ход.
+     */
+    public void move() {
+        //do nothing
+    }
+
+    /**
+     * Проверяем - не выходит ли (x,y) за границы.
+     */
+    public void checkBorders(double minx, double maxx, double miny, double maxy) {
+        if (x < minx) x = minx;
+        if (x > maxx) x = maxx;
+        if (y < miny) y = miny;
+        if (y > maxy) y = maxy;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public void setAlive(boolean alive) {
+        isAlive = alive;
+    }
+
+    public void die() {
+        isAlive = false;
+    }
+
+    /**
+     * Проверяем - пересекаются ли переданный(o) и наш(this) объекты.
+     */
+    public boolean isIntersect(BaseObject o) {
+        double dx = x - o.x;
+        double dy = y - o.y;
+        double destination = Math.sqrt(dx * dx + dy * dy);
+        double destination2 = Math.max(radius, o.radius);
+        return destination <= destination2;
+    }
+}
+package com.javarush.task.task25.task2515;
+
+/**
+ * Класс для бомбы.
+ */
+public class Bomb extends BaseObject {
+    public Bomb(double x, double y) {
+        super(x, y, 1);
+    }
+
+    /**
+     * Отрисовываем себя на холсте.
+     */
+    @Override
+    public void draw(Canvas canvas) {
+        canvas.setPoint(x, y, 'B');
+    }
+
+    /**
+     * Двигаем себя вниз на один ход.
+     */
+    @Override
+    public void move() {
+        y++;
+    }
+}
+package com.javarush.task.task25.task2515;
+
+
+public class Canvas {
+    private int width;
+    private int height;
+    private char[][] matrix;
+
+    public Canvas(int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.matrix = new char[height + 2][width + 2];
+    }
+
+    public void clear() {
+        this.matrix = new char[height + 2][width + 2];
+    }
+
+    public void drawMatrix(double x, double y, int[][] matrix, char c) {
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                if (matrix[i][j] != 0) {
+                    setPoint(x + j, y + i, c);
+                }
+            }
+        }
+    }
+
+    public void setPoint(double x, double y, char c) {
+        int xRounded = (int) Math.round(x);
+        int yRounded = (int) Math.round(y);
+        if (xRounded >= 0 && xRounded < matrix[0].length && yRounded >= 0 && yRounded < matrix.length) {
+            matrix[yRounded][xRounded] = c;
+        }
+    }
+
+    public void print() {
+        System.out.println();
+
+        for (int i = 0; i < height + 2; i++) {
+            for (int j = 0; j < width + 2; j++) {
+                System.out.print(" ");
+                System.out.print(matrix[i][j]);
+                System.out.print(" ");
+            }
+
+            System.out.println();
+        }
+
+        System.out.println();
+        System.out.println();
+        System.out.println();
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public char[][] getMatrix() {
+        return matrix;
+    }
+}
+package com.javarush.task.task25.task2515;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+
+public class KeyboardObserver extends Thread {
+    private Queue<KeyEvent> keyEvents = new ArrayBlockingQueue<KeyEvent>(100);
+
+    private JFrame frame;
+
+    @Override
+    public void run() {
+        frame = new JFrame("KeyPress Tester");
+        frame.setTitle("Transparent JFrame Demo");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        frame.setUndecorated(true);
+        frame.setSize(400, 400);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setLayout(new GridBagLayout());
+
+        frame.setOpacity(0.0f);
+        frame.setVisible(true);
+
+        frame.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                //do nothing
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                System.exit(0);
+            }
+        });
+
+
+        frame.addKeyListener(new KeyListener() {
+
+            public void keyTyped(KeyEvent e) {
+                //do nothing
+            }
+
+            public void keyReleased(KeyEvent e) {
+                //do nothing
+            }
+
+            public void keyPressed(KeyEvent e) {
+                keyEvents.add(e);
+            }
+        });
+    }
+
+
+    public boolean hasKeyEvents() {
+        return !keyEvents.isEmpty();
+    }
+
+    public KeyEvent getEventFromTop() {
+        return keyEvents.poll();
+    }
+}
+
+package com.javarush.task.task25.task2515;
+
+/**
+ * Класс для объектов-ракета
+ */
+public class Rocket extends BaseObject {
+
+    public Rocket(double x, double y) {
+        super(x, y, 1);
+    }
+
+    /**
+     * Метод рисует свой объект на "канвасе".
+     */
+    @Override
+    public void draw(Canvas canvas) {
+        canvas.setPoint(x, y, 'R');
+    }
+
+    /**
+     * Двигаем себя вверх на один ход.
+     */
+    @Override
+    public void move() {
+        y--;
+    }
+}
+package com.javarush.task.task25.task2515;
+
+/**
+ * Класс для космического корабля
+ */
+public class SpaceShip extends BaseObject {
+    //картинка корабля для отрисовки
+    private static int[][] matrix = {
+            {0, 0, 0, 0, 0},
+            {0, 0, 1, 0, 0},
+            {0, 0, 1, 0, 0},
+            {1, 0, 1, 0, 1},
+            {1, 1, 1, 1, 1},
+    };
+
+    //вектор движения (-1 влево,+1 вправо)
+    private double dx = 0;
+
+    public SpaceShip(double x, double y) {
+        super(x, y, 3);
+    }
+
+    /**
+     * Устанавливаем вектор движения влево
+     */
+    public void moveLeft() {
+        dx = -1;
+    }
+
+    /**
+     * Устанавливаем вектор движения вправо
+     */
+    public void moveRight() {
+        dx = 1;
+    }
+
+    /**
+     * Метод рисует свой объект на "канвасе".
+     */
+    @Override
+    public void draw(Canvas canvas) {
+        canvas.drawMatrix(x - radius + 1, y - radius + 1, matrix, 'M');
+    }
+
+    /**
+     * Двигаем себя на один ход.
+     * Проверяем столкновение с границами.
+     */
+    @Override
+    public void move() {
+        x = x + dx;
+
+        checkBorders(radius, Space.game.getWidth() - radius + 1, 1, Space.game.getHeight() + 1);
+    }
+
+    /**
+     * Стреляем.
+     * Создаем две ракеты: слева и справа от корабля.
+     */
+    public void fire() {
+        Space.game.getRockets().add(new Rocket(x - 2, y));
+        Space.game.getRockets().add(new Rocket(x + 2, y));
+    }
+}
+package com.javarush.task.task25.task2515;
+
+/**
+ * Класс для НЛО
+ */
+public class Ufo extends BaseObject {
+    //картинка для отрисовки
+    private static int[][] matrix = {
+            {0, 0, 0, 0, 0},
+            {0, 0, 1, 0, 0},
+            {1, 1, 1, 1, 1},
+            {0, 1, 1, 1, 0},
+            {0, 0, 0, 0, 0},
+    };
+
+    public Ufo(double x, double y) {
+        super(x, y, 3);
+    }
+
+    /**
+     * Метод рисует свой объект на "канвасе".
+     */
+    @Override
+    public void draw(Canvas canvas) {
+        canvas.drawMatrix(x - radius + 1, y - radius + 1, matrix, 'U');
+    }
+
+    /**
+     * Двигаем себя на один ход в случайном направлении.
+     */
+    @Override
+    public void move() {
+        double dx = Math.random() * 2 - 1;
+        double dy = Math.random() * 2 - 1;
+
+        x += dx;
+        y += dy;
+
+        checkBorders(radius, Space.game.getWidth() - radius + 1, radius - 1, Space.game.getHeight() / 2 - 1);
+
+        int random10 = (int) (Math.random() * 10);
+        if (random10 == 0)
+            fire();
+    }
+
+    /**
+     * Стреляем.
+     * Сбрасываем(создаем) одну бомбу прямо под собой.
+     */
+    public void fire() {
+        Space.game.getBombs().add(new Bomb(x, y + 3));
+    }
+}
+
+package com.javarush.task.task20.task2028;
+
+
+import java.io.Serializable;
+import java.util.*;
+
+/* 
+Построй дерево
+Итак, основа дерева создана, пора тебе поработать немного самому.
+Вспомним как должно выглядеть наше дерево.
+Элементы дерева должны следовать так как показано на картинке:
+
+http://info.javarush.ru/uploads/images/00/04/89/2014/03/21/ee9a9b.jpg
+Необходимо написать методы, которые бы позволили создать такую структуру дерева и проводить операции над ней.
+
+Тебе необходимо реализовать:
+1. метод add(String s) - добавляет элементы дерева, в качестве параметра принимает имя элемента (elementName), искать место для вставки начинаем слева направо.
+2. метод remove(Object o) - удаляет элемент дерева имя которого было полученного в качестве параметра.
+3. метод size() - возвращает текущее количество элементов в дереве.
+4. метод getParent(String s) - возвращает имя родителя элемента дерева, имя которого было полученного в качестве параметра.
+
+Требования:
+1. После добавления N элементов в дерево с помощью метода add, метод size должен возвращать N.
+2. После удаления последнего добавленного элемента из дерева с помощью метода remove, метод size должен возвращать N-1.
+3. После удаления второго элемента добавленного в дерево, метод size должен возвращать N/2 + 1 (для случаев где N > 2 и является степенью двойки), N - размер дерева до удаления.
+4. Метод getParent должен возвращать имя родителя для любого элемента дерева.
+*/
+public class CustomTree extends AbstractList <String> implements Cloneable,Serializable{
+
+    Entry <String> root = new Entry<String>("0");
+    private int size;
+    Entry rootFound = null;
+    int countRemoveEntrys = 0;
+//    {
+//        queue.add(root);
+//    }
+
+    public static void main(String[] args) {
+        List<String> list = new CustomTree();
+
+        for (int i = 1; i <= 16; i++) {
+            list.add(String.valueOf(i));
+ //           System.out.println(i);
+        }
+//        list.remove("16");
+        System.out.println(list.size());
+        System.out.println("Expected 3, actual is " + ((CustomTree) list).getParent("8"));
+//        list.remove("5");
+        System.out.println("Expected null, actual is " + ((CustomTree) list).getParent("11"));
+        System.out.println(((CustomTree) list).size);
+        list.remove("2");
+        System.out.println(((CustomTree) list).size);
+
+    }
+
+    static class Entry <T>  implements Serializable{
+        String elementName;
+        int lineNumber;
+        boolean availableToAddLeftChildren, availableToAddRightChildren;
+        Entry <T> parent, leftChild, rightChild;
+
+
+        public Entry(String elementName) {
+            this.elementName = elementName;
+            availableToAddLeftChildren = true;
+            availableToAddRightChildren = true;
+        }
+
+        void checkChildren (){
+            if (leftChild != null) availableToAddLeftChildren = false;
+            if (rightChild != null) availableToAddRightChildren = false;
+        }
+        boolean isAvailableToAddChildren() {
+            return availableToAddLeftChildren || availableToAddRightChildren;
+        }
+    }
+
+    @Override
+    public String get(int index) {
+        throw new UnsupportedOperationException();
+     //   return null;
+    }
+
+    @Override
+    public String set(int index, String element) {
+        return super.set(index, element);
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public boolean add(String elementName) {
+        try {
+//        if (root.elementName.equals("0"))
+//        {
+//            root = new Entry<String>(elementName);
+//            size++;
+//            return true;
+//        }
+
+        List<Entry<String>> queue = new ArrayList<>();
+        Entry<String> iter = root;
+        if (!iter.isAvailableToAddChildren())
+        {
+            queue.add(root);
+        }
+
+        while (!queue.isEmpty()) {
+            Entry<String> temp = queue.get(0);
+            if (temp.leftChild != null && temp.leftChild.isAvailableToAddChildren())
+            {
+                iter = temp.leftChild;
+                break;
+            }
+            else if (temp.rightChild != null && temp.rightChild.isAvailableToAddChildren())
+            {
+                iter = temp.rightChild;
+                break;
+            }
+            if (temp.leftChild != null)
+                queue.add(queue.size(), temp.leftChild);
+            if (temp.rightChild != null)
+                queue.add(queue.size(), temp.rightChild);
+            queue.remove(0);
+        }
+
+        if (iter.availableToAddLeftChildren) {
+            iter.leftChild = new Entry<>(elementName);
+            iter.leftChild.parent = iter;
+            iter.checkChildren();
+        } else {
+            iter.rightChild = new Entry<>(elementName);
+            iter.rightChild.parent = iter;
+            iter.checkChildren();
+        }
+        size++;
+    } catch (Exception e) {
+        return false;
+    }
+    return true;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        rootFound = null;
+        String s = (String) o;
+        findEntry(root, s);
+        if (rootFound ==(null)) return false;
+        else {
+            size--;
+            Entry rootRem = rootFound;
+            if (rootRem.leftChild !=(null)|| rootRem.rightChild != (null)) {
+                countRemoveEntry(rootRem);
+            }
+
+            rootFound = rootFound.parent;
+            if (rootFound.leftChild.elementName.equals(s)) rootFound.leftChild = null;
+            else rootFound.rightChild = null;
+        }
+        size -= countRemoveEntrys;
+        countRemoveEntrys = 0;
+        return true;
+    }
+    private void countRemoveEntry(Entry<String> rootRemove) {
+
+        if (rootRemove.leftChild != null) {
+            countRemoveEntrys++;
+            countRemoveEntry(rootRemove.leftChild);
+
+        }
+        if (rootRemove.rightChild != null) {
+            countRemoveEntrys++;
+            countRemoveEntry(rootRemove.rightChild);
+        }
+    }
+
+    private void findEntry(Entry<String> entry, String s) {
+        String name = entry.elementName;
+        if (name.equals(s)) {
+            rootFound = entry;
+            return;
+        }
+        if (rootFound == null && entry.leftChild != null) {
+            findEntry(entry.leftChild, s);
+        }
+        if (entry.rightChild != null && rootFound == null) {
+            findEntry(entry.rightChild, s);
+        }
+    }
+
+    public String getParent(String s) {
+        rootFound = null;
+        findEntry(root, s);
+        if (rootFound != (null)) return rootFound.parent.elementName;
+        else return null;
+    }
+
+    @Override
+    public List<String> subList(int fromIndex, int toIndex) {
+        throw new UnsupportedOperationException();
+   //     return super.subList(fromIndex, toIndex);
+    }
+
+    @Override
+    protected void removeRange(int fromIndex, int toIndex) {
+        super.removeRange(fromIndex, toIndex);
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends String> c) {
+        throw new UnsupportedOperationException();
+  //      return super.addAll(index, c);
+    }
+}
+
+package com.javarush.task.task22.task2213;
+
+import java.awt.event.KeyEvent;
+
+/**
+ * Класс Tetris - содержит основной функционал игры.
+ */
+public class Tetris {
+
+    private Field field;                //Поле с клетками
+    private Figure figure;              //Фигурка
+
+    private boolean isGameOver;         //Игра Окончена?
+
+    public Tetris(int width, int height) {
+        field = new Field(width, height);
+        figure = null;
+    }
+
+    /**
+     * Геттер переменной field.
+     */
+    public Field getField() {
+        return field;
+    }
+
+    /**
+     * Геттер переменной figure.
+     */
+    public Figure getFigure() {
+        return figure;
+    }
+
+    /**
+     * Основной цикл программы.
+     * Тут происходят все важные действия
+     */
+    public void run() throws Exception {
+        //Создаем объект "наблюдатель за клавиатурой" и стартуем его.
+        KeyboardObserver keyboardObserver = new KeyboardObserver();
+        keyboardObserver.start();
+
+        //выставляем начальное значение переменной "игра окончена" в ЛОЖЬ
+        isGameOver = false;
+        //создаем первую фигурку посередине сверху: x - половина ширины, y - 0.
+        figure = FigureFactory.createRandomFigure(field.getWidth() / 2, 0);
+
+        //пока игра не окончена
+        while (!isGameOver) {
+            //"наблюдатель" содержит события о нажатии клавиш?
+            if (keyboardObserver.hasKeyEvents()) {
+                //получить самое первое событие из очереди
+                KeyEvent event = keyboardObserver.getEventFromTop();
+                //Если равно символу 'q' - выйти из игры.
+                if (event.getKeyChar() == 'q') return;
+                //Если "стрелка влево" - сдвинуть фигурку влево
+                if (event.getKeyCode() == KeyEvent.VK_LEFT)
+                    figure.left();
+                    //Если "стрелка вправо" - сдвинуть фигурку вправо
+                else if (event.getKeyCode() == KeyEvent.VK_RIGHT)
+                    figure.right();
+                    //Если  код клавиши равен 12 ("цифра 5 на доп. клавиатуре") - повернуть фигурку
+                else if (event.getKeyCode() == 12)
+                    figure.rotate();
+                    //Если "пробел" - фигурка падает вниз на максимум
+                else if (event.getKeyCode() == KeyEvent.VK_SPACE)
+                    figure.downMaximum();
+            }
+
+            step();             //делаем очередной шаг
+            field.print();      //печатаем состояние "поля"
+            Thread.sleep(300);  //пауза 300 миллисекунд - 1/3 секунды
+        }
+
+        //Выводим сообщение "Game Over"
+        System.out.println("Game Over");
+    }
+
+    public void step() {
+        //опускаем фигурку вниз
+        figure.down();
+
+        //если разместить фигурку на текущем месте невозможно
+        if (!figure.isCurrentPositionAvailable()) {
+            figure.up();                    //поднимаем обратно
+            figure.landed();                //приземляем
+
+            isGameOver = figure.getY() <= 1;//если фигурка приземлилась на самом верху - игра окончена
+
+            field.removeFullLines();        //удаляем заполненные линии
+
+            figure = FigureFactory.createRandomFigure(field.getWidth() / 2, 0); //создаем новую фигурку
+        }
+    }
+
+    /**
+     * Сеттер для figure
+     */
+    public void setFigure(Figure figure) {
+        this.figure = figure;
+    }
+
+    /**
+     * Сеттер для field
+     */
+    public void setField(Field field) {
+        this.field = field;
+    }
+
+    public static Tetris game;
+
+    public static void main(String[] args) throws Exception {
+        game = new Tetris(10, 20);
+        game.run();
+    }
+}
+package com.javarush.task.task22.task2213;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+
+public class KeyboardObserver extends Thread {
+    private Queue<KeyEvent> keyEvents = new ArrayBlockingQueue<KeyEvent>(100);
+
+    private JFrame frame;
+
+    @Override
+    public void run() {
+        frame = new JFrame("KeyPress Tester");
+        frame.setTitle("Transparent JFrame Demo");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        frame.setUndecorated(true);
+        frame.setSize(400, 400);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setLayout(new GridBagLayout());
+
+        frame.setOpacity(0.0f);
+        frame.setVisible(true);
+
+        frame.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                //do nothing
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                System.exit(0);
+            }
+        });
+
+
+        frame.addKeyListener(new KeyListener() {
+
+            public void keyTyped(KeyEvent e) {
+                //do nothing
+            }
+
+            public void keyReleased(KeyEvent e) {
+                //do nothing
+            }
+
+            public void keyPressed(KeyEvent e) {
+                keyEvents.add(e);
+            }
+        });
+    }
+
+
+    public boolean hasKeyEvents() {
+        return !keyEvents.isEmpty();
+    }
+
+    public KeyEvent getEventFromTop() {
+        return keyEvents.poll();
+    }
+}
+
+package com.javarush.task.task22.task2213;
+
+/**
+ * Клсс FigureFactory отвечает за создание объектов-фигурок.
+ */
+public class FigureFactory {
+    /**
+     * Набор из шести шаблонов для фигурок
+     */
+    public static final int[][][] BRICKS = {{
+            {1, 1, 0},                          //   X X
+            {0, 1, 1},                          //     X X
+            {0, 0, 0}}, {                       //
+
+            {1, 0, 0},                          //   X
+            {1, 1, 0},                          //   X X
+            {0, 1, 0}}, {                       //     X
+
+            {0, 1, 0},                          //   X
+            {0, 1, 0},                          //   X
+            {0, 0, 0}}, {                       //   X
+
+            {1, 1, 0},                          //   X X
+            {1, 1, 0},                          //   X X
+            {0, 0, 0}}, {                       //
+
+            {1, 1, 1},                          //   X X X
+            {0, 1, 0},                          //     X
+            {0, 0, 0}}, {                       //
+
+            {1, 1, 1},                          //   X X X
+            {1, 1, 1},                          //   X X X
+            {0, 0, 0}}                          //
+    };
+
+    /**
+     * Метод выбирает случайный шаблон и создает с ним новую фигурку.
+     */
+    public static Figure createRandomFigure(int x, int y) {
+        int index = (int) (Math.random() * 6);
+        return new Figure(x, y, BRICKS[index]);
+    }
+}
+package com.javarush.task.task22.task2213;
+
+
+/**
+ * Класс Figure описывает фигурку тетриса
+ */
+public class Figure {
+    //метрица которая определяет форму фигурки: 1 - клетка не пустая, 0 - пустая
+    private int[][] matrix;
+    //координаты
+    private int x;
+    private int y;
+
+    public Figure(int x, int y, int[][] matrix) {
+        this.x = x;
+        this.y = y;
+        this.matrix = matrix;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int[][] getMatrix() {
+        return matrix;
+    }
+
+    /**
+     * Поворачиваем фигурку.
+     * Для простоты - просто вокруг главной диагонали.
+     */
+    public void rotate() {
+        int[][] matrix2 = new int[3][3];
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                matrix2[i][j] = matrix[j][i];
+            }
+        }
+
+        matrix = matrix2;
+    }
+
+    /**
+     * Двигаем фигурку влево.
+     * Проверяем не вылезла ли она за границу поля и/или не залезла ли на занятые клетки.
+     */
+    public void left() {
+        x--;
+        if (!isCurrentPositionAvailable())
+            x++;
+    }
+
+    /**
+     * Двигаем фигурку вправо.
+     * Проверяем не вылезла ли она за границу поля и/или не залезла ли на занятые клетки.
+     */
+    public void right() {
+        x++;
+        if (!isCurrentPositionAvailable())
+            x--;
+    }
+
+    /**
+     * Двигаем фигурку вверх.
+     * Используется, если фигурка залезла на занятые клетки.
+     */
+    public void up() {
+        y--;
+    }
+
+    /**
+     * Двигаем фигурку вниз.
+     */
+    public void down() {
+        y++;
+    }
+
+    /**
+     * Двигаем фигурку вниз до тех пор, пока не залезем на кого-нибудь.
+     */
+    public void downMaximum() {
+        while (isCurrentPositionAvailable()) {
+            y++;
+        }
+
+        y--;
+    }
+
+    /**
+     * Проверяем - может ли фигурка находится на текущей позиции:
+     * а) не выходит ли она за границы поля
+     * б) не заходит ли она на занятые клетки
+     */
+    public boolean isCurrentPositionAvailable() {
+        Field field = Tetris.game.getField();
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (matrix[i][j] == 1) {
+                    if (y + i >= field.getHeight())
+                        return false;
+
+                    Integer value = field.getValue(x + j, y + i);
+                    if (value == null || value == 1)
+                        return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Приземляем фигурку - добавляем все ее непустые клетки к клеткам поля.
+     */
+    public void landed() {
+        Field field = Tetris.game.getField();
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (matrix[i][j] == 1)
+                    field.setValue(x + j, y + i, 1);
+            }
+        }
+    }
+}
+package com.javarush.task.task22.task2213;
+
+import java.util.ArrayList;
+
+/**
+ * Класс Field описывает "поле клеток" игры Тетрис
+ */
+public class Field {
+    //ширина и высота
+    private int width;
+    private int height;
+
+    //матрица поля: 1 - клетка занята, 0 - свободна
+    private int[][] matrix;
+
+    public Field(int width, int height) {
+        this.width = width;
+        this.height = height;
+        matrix = new int[height][width];
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int[][] getMatrix() {
+        return matrix;
+    }
+
+    /**
+     * Метод возвращает значение, которое содержится в матрице с координатами (x,y)
+     * Если координаты за пределами матрицы, метод возвращает null.
+     */
+    public Integer getValue(int x, int y) {
+        if (x >= 0 && x < width && y >= 0 && y < height)
+            return matrix[y][x];
+
+        return null;
+    }
+
+    /**
+     * Метод устанавливает переданное значение(value) в ячейку матрицы с координатами (x,y)
+     */
+    public void setValue(int x, int y, int value) {
+        if (x >= 0 && x < width && y >= 0 && y < height)
+            matrix[y][x] = value;
+    }
+
+    /**
+     * Метод печатает на экран текущее содержание матрицы
+     */
+    public void print() {
+        //Создаем массив, куда будем "рисовать" текущее состояние игры
+        int[][] canvas = new int[height][width];
+
+        //Копируем "матрицу поля" в массив
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                canvas[i][j] = matrix[i][j];
+            }
+        }
+
+        //Копируем фигурку в массив, только непустые клетки
+        int left = Tetris.game.getFigure().getX();
+        int top = Tetris.game.getFigure().getY();
+        int[][] brickMatrix = Tetris.game.getFigure().getMatrix();
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (top + i >= height || left + j >= width) continue;
+                if (brickMatrix[i][j] == 1)
+                    canvas[top + i][left + j] = 2;
+            }
+        }
+
+
+        //Выводим "нарисованное" на экран, но начинаем с "границы кадра".
+        System.out.println("---------------------------------------------------------------------------\n");
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                int index = canvas[i][j];
+                if (index == 0)
+                    System.out.print(" . ");
+                else if (index == 1)
+                    System.out.print(" X ");
+                else if (index == 2)
+                    System.out.print(" X ");
+                else
+                    System.out.print("???");
+            }
+            System.out.println();
+        }
+
+
+        System.out.println();
+        System.out.println();
+    }
+
+    /**
+     * Удаляем заполненные линии
+     */
+    public void removeFullLines() {
+        //Создаем список для хранения линий
+        ArrayList<int[]> lines = new ArrayList<int[]>();
+
+        //Копируем все непустые линии в список.
+        for (int i = 0; i < height; i++) {
+            //подсчитываем количество единиц в строке - просто суммируем все ее значения
+            int count = 0;
+            for (int j = 0; j < width; j++) {
+                count += matrix[i][j];
+            }
+
+            //Если сумма строки не равна ее ширине - добавляем в список
+            if (count != width)
+                lines.add(matrix[i]);
+        }
+
+        //Добавляем недостающие строки в начало списка.
+        while (lines.size() < height) {
+            lines.add(0, new int[width]);
+        }
+
+        //Преобразуем список обратно в матрицу
+        matrix = lines.toArray(new int[height][width]);
+    }
+}
+
+
+package com.javarush.task.task32.task3205;
+
+import java.lang.reflect.Proxy;
+
+/*
+Создание прокси-объекта
+1) В отдельном файле создай публичный класс CustomInvocationHandler, который будет хэндлером при создании прокси-объекта.
+2) CustomInvocationHandler должен поддерживать интерфейс InvocationHandler.
+3) CustomInvocationHandler должен иметь один публичный конструктор с одним аргументом типа SomeInterfaceWithMethods.
+4) Перед вызовом любого метода у оригинального объекта должна выводиться фраза [methodName in].
+5) После вызова любого метода у оригинального объекта должна выводиться фраза [methodName out].
+6) Реализуй логику метода getProxy, который должен создавать прокси (Proxy.newProxyInstance(...)).
+См. пример вывода в методе main.
+Метод main не участвует в тестировании.
+
+
+Требования:
+1. Класс CustomInvocationHandler должен существовать.
+2. Класс CustomInvocationHandler должен поддерживать интерфейс InvocationHandler.
+3. Класс CustomInvocationHandler должен иметь один публичный конструктор с одним аргументом типа SomeInterfaceWithMethods.
+4. Перед вызовом любого метода у оригинального объекта должна выводиться фраза [methodName in].
+5. После вызова любого метода у оригинального объекта должна выводиться фраза [methodName out].
+6. Метод getProxy должен создавать прокси для интерфейса SomeInterfaceWithMethods.
+*/
+public class Solution {
+    public static void main(String[] args) {
+        SomeInterfaceWithMethods obj = getProxy();
+        obj.stringMethodWithoutArgs();
+        obj.voidMethodWithIntArg(1);
+
+        /* expected output
+        stringMethodWithoutArgs in
+        inside stringMethodWithoutArgs
+        stringMethodWithoutArgs out
+        voidMethodWithIntArg in
+        inside voidMethodWithIntArg
+        inside voidMethodWithoutArgs
+        voidMethodWithIntArg out
+        */
+    }
+
+    public static SomeInterfaceWithMethods getProxy() {
+        return (SomeInterfaceWithMethods) Proxy.newProxyInstance(SomeInterfaceWithMethods.class.getClassLoader(),
+                                                                SomeInterfaceWithMethodsImpl.class.getInterfaces(),
+                                                    new  CustomInvocationHandler(new SomeInterfaceWithMethodsImpl()));
+    }
+}
+
+package com.javarush.task.task32.task3205;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
+/**
+ * Created by Serge on 17.12.2017.
+ */
+public class CustomInvocationHandler implements InvocationHandler{
+    Object some;
+
+    public CustomInvocationHandler(SomeInterfaceWithMethods s) {
+        some = s;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        System.out.println(method.getName()+ " in");
+        Object res = method.invoke(some,args);
+        System.out.println(method.getName()+ " out");
+        return res;
+    }
+}
+package com.javarush.task.task32.task3205;
+
+public interface SomeInterfaceWithMethods {
+    void voidMethodWithoutArgs();
+
+    String stringMethodWithoutArgs();
+
+    void voidMethodWithIntArg(int i);
+}
+package com.javarush.task.task32.task3205;
+
+public class SomeInterfaceWithMethodsImpl implements SomeInterfaceWithMethods {
+    public void voidMethodWithoutArgs() {
+        System.out.println("inside voidMethodWithoutArgs");
+    }
+
+    public String stringMethodWithoutArgs() {
+        System.out.println("inside stringMethodWithoutArgs");
+        return null;
+    }
+
+    public void voidMethodWithIntArg(int i) {
+        System.out.println("inside voidMethodWithIntArg");
+        voidMethodWithoutArgs();
+    }
+}
+
+package com.javarush.task.task32.task3206;
+
+import java.lang.reflect.Proxy;
+
+/* 
+Дженерики для создания прокси-объекта
+В классе Solution создай публичный метод getProxy:
+1) Метод getProxy должен возвращать прокси для любого интерфейса, который наследуется от Item.
+2) getProxy должен иметь два параметра. Первый - класс возвращаемого типа, второй - классы дополнительных интерфейсов (используй аргумент переменной длины ...).
+3) Используй ItemInvocationHandler для создания прокси.
+Метод main не участвует в тестировании.
+
+
+Требования:
+1. В классе Solution должен существовать метод getProxy.
+2. Метод getProxy должен иметь два параметра. Первый - класс возвращаемого типа, второй - классы дополнительных интерфейсов.
+3. Метод getProxy должен возвращать прокси для любого интерфейса, который наследуется от Item.
+4. В методе getProxy при вызове Proxy.newProxyInstance передай this.getClass().getClassLoader() в качестве первого аргумента.
+5. В методе getProxy при вызове Proxy.newProxyInstance передай вторым аргументом все интерфейсы, которые прокси должен реализовать.
+6. В методе getProxy при вызове Proxy.newProxyInstance передай new ItemInvocationHandler() как третий аргумент.
+7. Метод getProxy должен работать согласно с условием.
+*/
+public class Solution {
+
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        test(solution.getProxy(Item.class));                        //true false false
+        test(solution.getProxy(Item.class, Small.class));           //true false true
+        test(solution.getProxy(Item.class, Big.class, Small.class));//true true true
+        test(solution.getProxy(Big.class, Small.class));            //true true true т.к. Big наследуется от Item
+        test(solution.getProxy(Big.class));                         //true true false т.к. Big наследуется от Item
+    }
+
+
+    private static void test(Object proxy) {
+        boolean isItem = proxy instanceof Item;
+        boolean isBig = proxy instanceof Big;
+        boolean isSmall = proxy instanceof Small;
+
+        System.out.format("%b %b %b\n", isItem, isBig, isSmall);
+    }
+
+    public  <T extends Item> T getProxy(Class <T> c,Class ... other) {
+        Class<?>[] interfaces = new Class[other.length + 1];
+        interfaces[0] = c;
+        System.arraycopy(other, 0, interfaces, 1, other.length);
+        return (T) Proxy.newProxyInstance(c.getClassLoader(), interfaces,new ItemInvocationHandler());
+    }
+}
+
+package com.javarush.task.task32.task3206;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
+public class ItemInvocationHandler implements InvocationHandler {
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        return null;
+    }
+}
+
+package com.javarush.task.task32.task3206;
+
+public interface Small {
+}
+
+package com.javarush.task.task32.task3206;
+
+public interface Big extends Item {
+}
+
+package com.javarush.task.task32.task3206;
+
+public interface Item {
+}
+
+package com.javarush.task.task32.task3207;
+
+import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+
+/* 
+К серверу по RMI
+Реализуй логику метода run в CLIENT_THREAD. В нем будет имитироваться клиентская часть, которая коннектится к серверу.
+1) Из registry получи сервис с именем UNIC_BINDING_NAME.
+2) Вызови метод у полученного сервиса, передай любой не пустой аргумент.
+3) Выведи в консоль результат вызова метода.
+4) Обработай специфические исключения.
+Метод main не участвует в тестировании.
+
+
+Требования:
+1. В методе run() необходимо из registry получить сервис с именем UNIC_BINDING_NAME.
+2. В методе run() необходимо вызвать метод doubleString (String) у полученного сервиса.
+3. В методе run() необходимо вывести в консоль результат вызова метода doubleString (String).
+4. В методе run() должен быть перехват исключения RemoteException.
+5. В методе run() должен быть перехват исключения NotBoundException.
+*/
+public class Solution {
+    public static final String UNIC_BINDING_NAME = "double.string";
+    public static Registry registry;
+
+    //pretend we start rmi client as CLIENT_THREAD thread
+    public static Thread CLIENT_THREAD = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            //напишите тут ваш код
+            try {
+//                registry = LocateRegistry.createRegistry(2099);
+                DoubleString str = (DoubleString) registry.lookup(UNIC_BINDING_NAME);
+                String example = "12345";
+                String result = str.doubleString(example);
+                System.out.println(result);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            } catch (NotBoundException e) {
+                e.printStackTrace();
+            }
+        }
+    });
+
+    public static void main(String[] args) {
+        //pretend we start rmi server as main thread
+        Remote stub = null;
+        final DoubleStringImpl service = new DoubleStringImpl();
+        try {
+            registry = LocateRegistry.createRegistry(2099);
+
+
+            stub = UnicastRemoteObject.exportObject(service, 0);
+            registry.bind(UNIC_BINDING_NAME, stub);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (AlreadyBoundException e) {
+            e.printStackTrace();
+        }
+
+        //start client
+        CLIENT_THREAD.start();
+    }
+}
+
+package com.javarush.task.task32.task3207;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface DoubleString extends Remote {
+    String doubleString(String str) throws RemoteException;
+}
+
+package com.javarush.task.task32.task3207;
+
+import java.rmi.RemoteException;
+
+public class DoubleStringImpl implements DoubleString {
+    public String doubleString(String str) throws RemoteException {
+        return str + str;
+    }
+}
+
+package com.javarush.task.task32.task3208;
+
+import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+
+/* 
+RMI-2
+Реализуй логику метода run в SERVER_THREAD. В нем будет имитироваться серверная часть:
+1) Инициализируй поле registry, которое будет принимать и обрабатывать запросы на 2099 порту.
+2) Создай два объекта - Cat и Dog.
+3) Используй класс UnicastRemoteObject, чтобы создать Remote объекты для созданных Cat и Dog.
+Remote объекты будут в состоянии принимать обращения к своим методам используя выбранный порт (2099).
+4) Для Cat и Dog добавь в registry связь уникального текстового ключа и Remote объекта. Текстовый ключ придумай сам.
+5) При возникновении любого исключения выведи его стек-трейс в поток System.err.
+Метод main не участвует в тестировании.
+
+
+Требования:
+1. В методе run() необходимо инициализировать поле registry. Для этого используй LocateRegistry.createRegistry (2099).
+2. В методе run() необходимо создать два объекта - Cat и Dog.
+3. В методе run() необходимо создать Remote объекты для созданных Cat и Dog используя UnicastRemoteObject.exportObject (Remote, int).
+4. Для Cat и Dog нужно добавить в registry связь уникального текстового ключа и Remote объекта используя registry.bind (String, Remote).
+5. При возникновении любого исключения нужно вывести его стек-трейс в поток System.err используя метод printStackTrace ().
+*/
+
+public class Solution {
+    public static Registry registry;
+    public static final String CAT = "a";
+    public static final String DOG = "b";
+
+    //pretend we start rmi client as CLIENT_THREAD thread
+    public static Thread CLIENT_THREAD = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            try {
+                for (String bindingName : registry.list()) {
+                    Animal service = (Animal) registry.lookup(bindingName);
+                    service.printName();
+                    service.say();
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            } catch (NotBoundException e) {
+                e.printStackTrace();
+            }
+        }
+    });
+
+    //pretend we start rmi server as SERVER_THREAD thread
+    public static Thread SERVER_THREAD = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            //напишите тут ваш код
+            try {
+                final Animal cat = new Cat("Aska");
+                final Animal dog = new Dog("Doggy");
+                registry = LocateRegistry.createRegistry(2099);
+                Remote stub =  UnicastRemoteObject.exportObject(cat,0);
+                Remote stub1 = UnicastRemoteObject.exportObject(dog,0);
+
+                registry.bind(CAT,stub);
+                registry.bind(DOG, stub1);
+
+                } catch (AlreadyBoundException e) {
+                    e.printStackTrace();
+                }
+             catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
+        }
+    });
+
+    public static void main(String[] args) throws InterruptedException {
+        //start rmi server thread
+        SERVER_THREAD.start();
+        Thread.sleep(1000);
+        //start client
+        CLIENT_THREAD.start();
+    }
+}
+
+package com.javarush.task.task32.task3208;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface Animal extends Remote {
+    void say() throws RemoteException;
+
+    void printName() throws RemoteException;
+}
+
+package com.javarush.task.task32.task3208;
+
+import java.rmi.RemoteException;
+
+public class Cat implements Animal {
+
+    private String name;
+
+    public Cat(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void say() throws RemoteException {
+        System.out.println("meow");
+    }
+
+    @Override
+    public void printName() throws RemoteException {
+        System.out.print("Cat " + name + " ");
+    }
+}
+
+package com.javarush.task.task32.task3208;
+
+import java.rmi.RemoteException;
+
+public class Dog implements Animal {
+
+    private String name;
+
+    public Dog(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void say() throws RemoteException {
+        System.out.println("woof");
+    }
+
+    @Override
+    public void printName() throws RemoteException {
+        System.out.print("Dog " + name + " ");
+    }
+}
+
+package com.javarush.task.task21.task2102;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
+/* 
+Сравниваем модификаторы
+Реализовать логику метода isAllModifiersContainSpecificModifier, который проверяет, содержит ли 
+переданный параметр allModifiers значение конкретного модификатора specificModifier.
+
+P.S. Перед выполнением задания ознакомься с классом Modifier и реализацией методов isPublic, isStatic и т.п.
+
+
+Требования:
+1. Метод isAllModifiersContainSpecificModifier должен быть статическим.
+2. Метод isAllModifiersContainSpecificModifier должен возвращать значение типа boolean.
+3. Метод isAllModifiersContainSpecificModifier должен принимать два параметра типа int.
+4. Метод isAllModifiersContainSpecificModifier должен возвращать корректное значение в соответствии 
+с условием задачи(true, если заданный модификатор присутствует в allModifiers, иначе false).
+*/
+public class Solution {
+    public static void main(String[] args) {
+        int modifiersOfThisClass = Solution.class.getModifiers();
+        System.out.println(isAllModifiersContainSpecificModifier(modifiersOfThisClass, Modifier.PUBLIC));   //true
+        System.out.println(isAllModifiersContainSpecificModifier(modifiersOfThisClass, Modifier.STATIC));   //false
+
+        int modifiersOfMethod = getMainMethod().getModifiers();
+        System.out.println(isAllModifiersContainSpecificModifier(modifiersOfMethod, Modifier.STATIC));      //true
+    }
+
+    public static boolean isAllModifiersContainSpecificModifier(int allModifiers, int specificModifier) {
+        boolean b = false;
+        switch (specificModifier) {
+            case Modifier.PUBLIC:
+                b = Modifier.isPublic(allModifiers);
+                break;
+            case Modifier.ABSTRACT:
+                b = Modifier.isAbstract(allModifiers);
+                break;
+            case Modifier.PRIVATE:
+                b = Modifier.isPrivate(allModifiers);
+                break;
+            case Modifier.STATIC:
+                b = Modifier.isStatic(allModifiers);
+                break;
+
+        } return b;
+    }
+    private static Method getMainMethod() {
+        Method[] methods = Solution.class.getDeclaredMethods();
+        for (Method method : methods) {
+            if (method.getName().equalsIgnoreCase("main")) return method;
+        }
+
+        return null;
+    }
+}
+
+package com.javarush.task.task21.task2101;
+
+import java.lang.reflect.Array;
+
+/*
+Определяем адрес сети
+1. Даны IP-адрес и маска подсети, необходимо вычислить адрес сети - реализуй метод getNetAddress.
+Используйте операцию поразрядной конъюнкции (логическое И).
+
+Пример:
+IP-адрес: 11000000 10101000 00000001 00000010 (192.168.1.2)
+Маска подсети: 11111111 11111111 11111110 00000000 (255.255.254.0)
+Адрес сети: 11000000 10101000 00000000 00000000 (192.168.0.0)
+
+2. Реализовать метод print, который выведет в консоль данные в двоичном коде. Для IP-адреса(192.168.1.2)
+должна быть выведена строка "11000000 10101000 00000001 00000010"
+3. Метод main не участвует в тестировании
+*/
+public class Solution {
+    public static void main(String[] args) {
+        byte[] ip = new byte[]{(byte) 192, (byte) 168, 1, 2};
+        byte[] mask = new byte[]{(byte) 255, (byte) 255, (byte) 254, 0};
+        byte[] netAddress = getNetAddress(ip, mask);
+        print(ip);          //11000000 10101000 00000001 00000010
+        print(mask);        //11111111 11111111 11111110 00000000
+        print(netAddress);  //11000000 10101000 00000000 00000000
+    }
+
+    public static byte[] getNetAddress(byte[] ip, byte[] mask) {
+        byte [] b = new byte[4];
+        b[0] = (byte) (ip[0] & mask [0]);
+        b[1] = (byte) (ip[1] & mask [1]);
+        b[2] = (byte) (ip[2] & mask [2]);
+        b[3] = (byte) (ip[3] & mask [3]);
+        return b;
+    }
+
+    public static void print(byte[] bytes) {
+        for(byte b : bytes){
+            String tmp = Integer.toBinaryString(b & 0xff );
+            System.out.print( ("00000000" + tmp).substring(tmp.length()) +" ");
+//            String theByte = Integer.toBinaryString(word & 0xff);
+//            while(theByte.length() < 8) theByte = "0" + theByte;
+//            System.out.print(theByte);
+//            System.out.print(" ");
+        }
+        System.out.println();
+    }
+}
+
+package com.javarush.task.task34.task3403;
+
+/* 
+Разложение на множители с помощью рекурсии
+Разложить целое число n > 1 на простые множители.
+Вывести в консоль через пробел все множители в порядке возрастания.
+Написать рекурсивный метод для вычисления простых множителей.
+Не создавай в классе Solution дополнительные поля.
+
+Пример:
+132
+
+Вывод на консоль:
+2 2 3 11
+
+
+Требования:
+1. В классе Solution не должны быть созданы дополнительные поля.
+2. Метод recursion должен выводить на экран все простые множители числа полученного в качестве параметра (пример в условии).
+3. Метод recursion не должен быть статическим.
+4. Метод recursion должен быть рекурсивным.
+*/
+public class Solution {
+    public static void main(String[] args) {
+
+        Solution solution = new Solution();
+        solution.recursion(9);
+    }
+
+    public void recursion(int n) {
+
+        int a = 2;
+        while (a <= n) {
+            if ((n % a) == 0) {
+                if (a != n) {
+                    System.out.print(a + " ");
+                    recursion(n / a);
+                } else {
+                    System.out.print(a);
+                }
+                return;
+            }
+            a++;
+        }
+    }
+}
+
+package com.javarush.task.task34.task3411;
+
+/* 
+Ханойские башни
+Имеется три стержня. На стержень A нанизаны count колец, причем кольца отличаются размером и лежат меньшее на большем. Требуется перенести пирамиду из count колец с стержня A на стержень B за наименьшее число ходов.
+За один раз разрешается переносить только одно кольцо, причем нельзя класть большее кольцо на меньшее.
+Нужно реализовать публичный статический метод void moveRing(char a, char b, char c, int count), который выведет последовательность действий, необходимых для перемещения колец со стержня A на стержень B.
+
+Параметры метода:
+char a - имя стержня, на котором в начале находятся все кольца;
+char b - имя стержня, на который нужно перенести все кольца;
+char c - имя вспомогательного стержня;
+int count - общее количество колец, которые необходимо перенести.
+Задачу нужно решать используя рекурсивный вызов метода moveRing.
+
+Пример1:
+Метод moveRing вызывается с параметрами: 'A', 'B', 'C', 1
+
+Ожидаемый вывод:
+from A to B
+
+Пример2:
+Метод moveRing вызывается с параметрами: 'A', 'B', 'C', 3
+
+Ожидаемый вывод:
+from A to B
+from A to C
+from B to C
+from A to B
+from C to A
+from C to B
+from A to B
+
+Подсказка: общее количество действий равно 2 в степени count минус 1.
+
+
+Требования:
+1. В классе Solution должен существовать публичный статический метод void moveRing(char, char, char, int).
+2. Методе moveRing должен быть рекурсивным.
+3. Количество действий по перемещению колец должно быть равно 2 в степени count минус 1.
+4. Вывод метода moveRing должен соответствовать условию.
+*/
+
+public class Solution {
+    public static void main(String[] args) {
+        int count = 3;
+        moveRing('A', 'B', 'C', count);
+    }
+
+    public static void moveRing(char a, char b, char c, int count) {
+        //напишите тут ваш код
+        if(count>0){
+            moveRing( a, c, b,count-1);
+            System.out.println("from "+ a + " to "+ b);
+            moveRing ( c, b, a, count - 1);
+        }
+    }
+}
+
+package com.javarush.task.task34.task3405;
+
+import java.lang.ref.SoftReference;
+import java.util.ArrayList;
+import java.util.List;
+
+/* 
+Мягкие ссылки
+Разберись в примере.
+Внутри метода main после создания объекта типа Monkey создай мягкую ссылку (SoftReference) на него.
+*/
+public class Solution {
+    public static Helper helper = new Helper();
+
+    public static class Monkey {
+        private String name;
+
+        public Monkey(String name) {
+            this.name = name;
+        }
+
+        protected void finalize() {
+            Helper.isFinalized = true;
+            System.out.format("Bye-Bye, %s!\n", name);
+        }
+    }
+
+    public static void main(String args[]) throws InterruptedException {
+        helper.startTime();
+
+        Monkey monkey = new Monkey("Simka");
+
+        //Add reference here
+        SoftReference reference = new SoftReference(monkey);
+
+        helper.callGC();
+
+        monkey = null;
+
+        helper.callGC();
+        helper.heapConsuming();
+
+        if (reference.get() == null)
+            System.out.println("Finalized");
+
+        helper.finish();
+    }
+
+    public static class Helper {
+        public static boolean isFinalized;
+
+        private long startTime;
+
+        void startTime() {
+            this.startTime = System.currentTimeMillis();
+        }
+
+        int getTime() {
+            return (int) (System.currentTimeMillis() - startTime) / 1000;
+        }
+
+        void callGC() throws InterruptedException {
+            System.gc();
+            Thread.sleep(1000);
+        }
+
+        void heapConsuming() {
+            try {
+                List<Solution> heap = new ArrayList<Solution>(100000);
+                while (!isFinalized) {
+                    heap.add(new Solution());
+                }
+            } catch (OutOfMemoryError e) {
+                System.out.println("Out of memory error raised");
+            }
+        }
+
+        public void finish() {
+            System.out.println("Done");
+            System.out.println("It took " + getTime() + " sec");
+        }
+    }
+}
+
+package com.javarush.task.task34.task3406;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+
+/* 
+Слабые ссылки
+Разберись в примере.
+Внутри метода main после создания объекта типа Monkey создай слабую ссылку (WeakReference) на него.
+*/
+public class Solution {
+    public static Helper helper = new Helper();
+
+    public static class Monkey {
+        private String name;
+
+        public Monkey(String name) {
+            this.name = name;
+        }
+
+        protected void finalize() {
+            Helper.isFinalized = true;
+            System.out.format("Bye-Bye, %s!\n", name);
+        }
+    }
+
+    public static void main(String args[]) throws InterruptedException {
+        helper.startTime();
+
+        Monkey monkey = new Monkey("Simka");
+
+        //Add reference here
+        WeakReference reference = new WeakReference(monkey);
+
+        helper.callGC();
+
+        monkey = null;
+
+        helper.callGC();
+        helper.heapConsuming();
+
+        if (reference.get() == null)
+            System.out.println("Finalized");
+
+        helper.finish();
+    }
+
+    public static class Helper {
+        public static boolean isFinalized;
+
+        private long startTime;
+
+        void startTime() {
+            this.startTime = System.currentTimeMillis();
+        }
+
+        int getTime() {
+            return (int) (System.currentTimeMillis() - startTime) / 1000;
+        }
+
+        void callGC() throws InterruptedException {
+            System.gc();
+            Thread.sleep(1000);
+        }
+
+        void heapConsuming() {
+            try {
+                List<Solution> heap = new ArrayList<Solution>(100000);
+                while (!isFinalized) {
+                    heap.add(new Solution());
+                }
+            } catch (OutOfMemoryError e) {
+                System.out.println("Out of memory error raised");
+            }
+        }
+
+        public void finish() {
+            System.out.println("Done");
+            System.out.println("It took " + getTime() + " sec");
+        }
+    }
+}
+
+package com.javarush.task.task34.task3413;
+
+/* 
+Кеш на основании SoftReference
+Реализуй логику методов get, put, remove класса SoftCache:
+
+Метод AnyObject get(Long key) должен возвращать объект типа AnyObject из мапы cacheMap по ключу key. Если такого ключа в cacheMap нет - верни null.
+
+Метод AnyObject put(Long key, AnyObject value) должен добавлять в мапу пару key : value. Метод должен вернуть null, если в cacheMap по такому ключу ранее не было значения. Иначе - верни предыдущее значение value по этому ключу. Не забудь вызвать метод clear() у объекта типа SoftReference<AnyObject>.
+
+Метод AnyObject remove(Long key) должен удалить из мапы cacheMap пару key : value по ключу key. Метод должен вернуть null, если в cacheMap по такому ключу ранее не было значения. Иначе - верни предыдущее значение value по этому ключу. Не забудь вызвать метод clear() у объекта типа SoftReference<AnyObject>.
+
+Не изменяй класс AnyObject.
+Метод main не принимает участия в тестировании.
+
+
+Требования:
+1. Класс AnyObject не должен быть изменен.
+2. В классе SoftCache должно существовать приватное поле Map> cacheMap.
+3. Реализуй метод get согласно условию.
+4. Реализуй метод put согласно условию.
+5. Реализуй метод remove согласно условию.
+*/
+
+public class Solution {
+    public static void main(String[] args) {
+        SoftCache cache = new SoftCache();
+
+        for (long i = 0; i < 2_500_000; i++) {
+            cache.put(i, new AnyObject(i, null, null));
+        }
+    }
+
+
+}
+
+package com.javarush.task.task34.task3413;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+public class AnyObject {
+
+    private Long id;
+    private String name;
+    private Calendar creationTime = new GregorianCalendar();
+    private String additionalDescription;
+
+    public AnyObject(Long id, String name, String additionalDescription) {
+        this.id = id;
+        if (name != null) {
+            this.name = name;
+        } else {
+            this.name = "AnyObject#" + id;
+        }
+        if (additionalDescription != null) {
+            this.additionalDescription = additionalDescription;
+        } else {
+            this.additionalDescription = "This is object #" + id;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AnyObject that = (AnyObject) o;
+
+        if (!id.equals(that.id)) return false;
+        if (!name.equals(that.name)) return false;
+        return creationTime.equals(that.creationTime);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + creationTime.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AnyObject{" +
+                "id = " + id +
+                ", name = '" + name + '\'' +
+                ", creationTime = " + creationTime.getTime() +
+                ", additionalDescription = '" + additionalDescription + '\'' +
+                '}';
+    }
+}
+
+package com.javarush.task.task34.task3413;
+
+import java.lang.ref.SoftReference;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class SoftCache {
+    private Map<Long, SoftReference<AnyObject>> cacheMap = new ConcurrentHashMap<>();
+
+    public AnyObject get(Long key) {
+        SoftReference<AnyObject> softReference = cacheMap.get(key);
+        //напишите тут ваш код
+        if (cacheMap.get(key) != null){
+            return softReference.get();
+        } else return null;
+
+    }
+
+    public AnyObject put(Long key, AnyObject value) {
+        SoftReference<AnyObject> softReference = cacheMap.put(key, new SoftReference<>(value));
+        //напишите тут ваш код
+        if (softReference==null){
+            return null;
+        } else {
+            AnyObject anyObject = softReference.get();
+            softReference.clear();
+            return anyObject;
+        }
+    }
+
+    public AnyObject remove(Long key) {
+        SoftReference<AnyObject> softReference = cacheMap.remove(key);
+        //напишите тут ваш код
+        if (softReference==null){
+            return null;
+        } else {
+            AnyObject anyObject = softReference.get();
+            softReference.clear();
+            return anyObject;
+        }
+    }
+}
+
+package com.javarush.task.task34.task3407;
+
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+import java.util.ArrayList;
+import java.util.List;
+
+/* 
+Призрачные ссылки
+Разберись в примере.
+Реализуй логику метода getFilledList класса Helper:
+1) создай список, который сможет хранить призрачные ссылки на объекты Monkey
+2) добавь в список 200 ссылок, используйте очередь helper.getQueue()
+3) верни заполненный список
+
+
+Требования:
+1. Метод getFilledList должен возвращать список заполненный фантомными ссылками на объекты типа Monkey.
+2. Метод getFilledList должен возвращать список из 200 элементов.
+3. Класс Helper не должен быть приватным.
+4. Метод getFilledList не должен быть приватным.
+*/
+public class Solution {
+    public static Helper helper = new Helper();
+
+    public static class Monkey {
+    }
+
+    public static void main(String args[]) throws InterruptedException {
+        helper.startTime();
+        List<PhantomReference<Monkey>> list = helper.getFilledList();
+
+        //before GC
+        helper.checkListWithReferences(list, "before");
+
+        helper.callGC();
+        helper.heapConsuming();
+
+        //after GC
+        helper.checkListWithReferences(list, "after");
+
+        helper.finish();
+    }
+
+    public static class Helper {
+        private ReferenceQueue<Monkey> queue = new ReferenceQueue<>();
+
+        private long startTime;
+
+        void startTime() {
+            this.startTime = System.currentTimeMillis();
+        }
+
+        int getTime() {
+            return (int) (System.currentTimeMillis() - startTime) / 1000;
+        }
+
+        void callGC() throws InterruptedException {
+            System.gc();
+            Thread.sleep(1000);
+        }
+
+        public ReferenceQueue<Monkey> getQueue() {
+
+            return queue;
+        }
+
+        void heapConsuming() {
+            try {
+                List<Solution> heap = new ArrayList<Solution>(100000);
+                while (true) {
+                    heap.add(new Solution());
+                }
+            } catch (OutOfMemoryError e) {
+                System.out.println("Out of memory error raised");
+            }
+        }
+
+        public void checkListWithReferences(List<PhantomReference<Monkey>> list, String string) {
+            int count = 0;
+            for (PhantomReference<Monkey> reference : list) {
+                if (reference.isEnqueued()) {
+                    count++;
+                }
+            }
+
+            System.out.println(String.format("The enqueue reference count is %d (%s GC was called)", count, string));
+        }
+
+        public List<PhantomReference<Monkey>> getFilledList() {
+            List <PhantomReference<Monkey>>list = new ArrayList();
+            for (long i = 0; i < 200; i++) {
+                list.add( new PhantomReference<Monkey>(new Monkey(),getQueue()));
+            }
+            return list;
+        }
+
+        public void finish() throws InterruptedException {
+            int count = 0;
+            while (queue.poll() != null) {
+                count++;
+            }
+            System.out.println(count + " objects are in the queue of phantom reference");
+            System.out.println("It took " + getTime() + " sec");
+        }
+    }
+}
+
+package com.javarush.task.task34.task3408;
+
+/* 
+Кэширование
+Класс Cache - универсальный параметризированный класс для кеширования объектов.
+Он работает с классами (дженерик тип Т), у которых обязан быть:
+а) публичный конструктор с одним параметром типа K;
+б) метод K getKey() с любым модификатором доступа.
+
+Задание:
+1. Выбери правильный тип для поля cache. Map<K, V> cache должен хранить ключи, на которые есть активные ссылки.
+Если нет активных ссылок на ключи, то они вместе со значениями должны автоматически удаляться из cache.
+2. Реализуй логику метода getByKey:
+2.1. Верни объект из cache для ключа key.
+2.2. Если объекта не существует в кэше, то добавьте в кэш новый экземпляр используя рефлексию, см. пункт а).
+3. Реализуй логику метода put:
+3.1. Используя рефлексию получи ссылку на метод, описанный в пункте б).
+3.2. Используя рефлексию разреши к нему доступ.
+3.3. Используя рефлексию вызови метод getKey у объекта obj, таким образом ты получишь ключ key.
+3.4. Добавь в кэш пару <key, obj>.
+3.5. Верни true, если метод отработал корректно, false в противном случае. Исключения игнорируй.
+
+
+Требования:
+1. Поле cache должно быть инициализировано объектом типа WeakHashMap.
+2. Метод getByKey должен возвращать объект из кеша.
+3. Метод getByKey должен добавлять объект в кеш если его там нет.
+4. Метод put должен извлекать из переданного объекта ключ и добавлять в кеш пару .
+5. Метод put должен возвращать true, если он отработал корректно, иначе false.
+*/
+public class Solution {
+    public static void main(String[] args) throws Exception {
+        SomeKey someKey = new SomeKey();
+        someKey.name = "test";
+
+        SomeKey someKeyNew = new SomeKey();
+        someKeyNew.name = "testNew";
+
+        SomeValue value = new SomeValue(someKey);
+
+        Cache<SomeKey, SomeValue> cache = new Cache<>();
+        cache.put(value);
+
+        SomeValue valueFromCacheExisted = cache.getByKey(someKey, SomeValue.class);
+        System.out.println(valueFromCacheExisted);
+
+        SomeValue valueFromCacheNew = cache.getByKey(someKeyNew, SomeValue.class);
+        System.out.println(valueFromCacheNew);
+
+        System.out.println(cache.size());
+        /* expected output:
+        SomeValue{myKey=SomeKey{name='test'}}
+        SomeValue{myKey=SomeKey{name='testNew'}}
+        2
+         */
+    }
+
+    public static class SomeKey {
+        String name;
+
+        @Override
+        public String toString() {
+            return "SomeKey{" +
+                    "name='" + name + '\'' +
+                    '}';
+        }
+    }
+
+    public static class SomeValue {
+        private SomeKey myKey;
+
+        public SomeValue() {
+        }
+
+        public SomeValue(SomeKey myKey) {        //use this constructor
+            this.myKey = myKey;
+        }
+
+        private SomeKey getKey() {
+            return myKey;
+        }
+
+        @Override
+        public String toString() {
+            return "SomeValue{" +
+                    "myKey=" + myKey +
+                    '}';
+        }
+    }
+}
+
+package com.javarush.task.task34.task3408;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.WeakHashMap;
+
+public class Cache<K, V> {
+    private Map<K, V> cache = new WeakHashMap<>();   //TODO add your code here
+
+    public V getByKey(K key, Class<V> clazz) throws Exception {
+        //TODO add your code here
+        V v = null;
+        if (cache.get(key) == null){
+            Class[] paramTypes = new Class[] { key.getClass() };
+            Constructor aConstruct = clazz.getConstructor(paramTypes);
+            v = (V) aConstruct.newInstance(key);
+            cache.put(key, v);
+        } else v = cache.get(key);
+        return v;
+    }
+
+    public boolean put(V obj) {
+        //TODO add your code here
+        Class v = obj.getClass();
+        Method method = null;
+        try {
+            method= v.getDeclaredMethod("getKey", null);
+            method.setAccessible(true);
+            K k = (K) method.invoke(obj);
+            cache.put(k,obj);
+            return cache.containsKey(k);
+        } catch (NoSuchMethodException e) {
+            return false;
+        } catch (IllegalAccessException e) {
+            return  false;
+        } catch (InvocationTargetException e) {
+            return false;
+        }
+    }
+
+    public int size() {
+        return cache.size();
+    }
+}
+
+package com.javarush.task.task34.task3409;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Properties;
+
+/* 
+Настраиваем логгер
+Дан файл log4j.properties, который содержит настройки логгера для разработчиков.
+Изменились требования к логированию для продакшена.
+
+Список изменений, которые нужно сделать:
+1) Размер файла для логирования не должен превышать 5 мегабайт.
+2) Файлы лога должны храниться на диске D в директории log, называться должны runApp.log.
+3) Файлы лога должны содержать 6 последних файлов. Если шестой файл уже заполнен (имеет размер 5Мб), то нужно удалить самый первый и создать новый.
+4) Уровень вывода сообщений в консоль нужно установить на уровне ERROR.
+5) Минимальный уровень логирования выставить в WARN.
+
+Отредактируй файл log4j.properties в соответствии с предоставленными требованиями.
+
+
+Требования:
+1. Размер файла для логирования не должен превышать 5 мегабайт.
+2. Файлы лога должны храниться на диске D в директории log, называться должны runApp.log.
+3. Файлы лога должны содержать 6 последних файлов. Если шестой файл уже заполнен(имеет размер 5Мб), то нужно удалить самый первый и создать новый.
+4. Уровень вывода сообщений в консоль нужно установить на уровне ERROR.
+5. Минимальный уровень логирования выставить в WARN.
+*/
+public class Solution {
+    public static void main(String args[]) throws IOException {
+        String logProperties = "src/" + Solution.class.getPackage().getName().replaceAll("[.]", "/") + "/log4j.properties";
+//        String logProperties = "D:\\"+ "\\log4j.properties";
+        Path path = Paths.get(logProperties).toAbsolutePath();
+        try (InputStream is = new FileInputStream(path.toFile())) {
+            Properties properties = new Properties();
+            properties.load(is);
+        }
+    }
+}
+
+log4j.rootLogger=INFO, file, stdout
+
+# Direct log messages to a log file
+log4j.appender.file=org.apache.log4j.RollingFileAppender
+log4j.appender.file.threshold=WARN
+log4j.appender.file.File=D:\\log\\runApp.log
+log4j.appender.file.MaxFileSize=5MB
+log4j.appender.file.MaxBackupIndex=6
+log4j.appender.file.layout=org.apache.log4j.PatternLayout
+log4j.appender.file.layout.ConversionPattern= %-5p %c{1}:%L - %m%n
+
+# Direct log messages to stdout
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.threshold=ERROR
+log4j.appender.stdout.Target=System.out
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss}
+
+log4j.logger.org.springframework=ERROR
+log4j.logger.org.hibernate=ERROR
+log4j.logger.org.apache.cxf=ERROR
+
+package com.javarush.task.task34.task3412;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+import java.util.Date;
+
+/* 
+Добавление логирования в класс
+Добавление логирования в класс
+В Intellij IDEA Alt+Ctrl+Shift+S -> Global Libraries -> New Global Library -> From Maven...
+
+В строке поиска в открывшемся окне укажи: org.slf4j:slf4j-api:1.7.23 -> Поиск (Shift+Enter)
+//ПРИМ НАДО slf4j-simple-1.7.25.jar и slf4j-api-1.7.25.jar 
+Укажи куда скачать библиотеку логирования.
+Выбрери к какому модулю проекта подключить библиотеку slf4j-api: нужно выбрать
+4.JavaCollections -> OK
+Apply -> OK.
+
+Посмотри где бы ты в классе Solution применил какой уровень логирования?
+
+В класс Solution нужно добавить вызовы методов уровня:
+error - 1 раз;
+debug - 6 раз - используй при изменениях значений полей класса;
+trace - 4 раза - используй для отслеживания пути выполнения програмы;
+Сообщения в логах старайся писать информативные.
+Остальной код не изменяй.
+
+
+Требования:
+1. В классе Solution должно существовать приватное статическое финальное поле logger.
+2. Добавь логирование уровня error один раз.
+3. Добавь логирование уровня debug шесть раз.
+4. Добавь логирование уровня trace четыре раза.
+*/
+
+public class Solution {
+    private static final Logger logger = LoggerFactory.getLogger(Solution.class);
+
+    private int value1;
+    private String value2;
+    private Date value3;
+    static {}
+
+    public Solution(int value1, String value2, Date value3) {
+        logger.debug("Constructor 1:"+this.value1+" 2: "+this.value2+" 3: "+this.value3);
+        this.value1 = value1;
+        this.value2 = value2;
+        this.value3 = value3;
+    }
+
+    public static void main(String[] args) {
+//        System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE");
+    }
+
+    public void calculateAndSetValue3(long value) {
+        logger.trace ("Start calculateAndSetValue3");
+        value -= 133;
+        if (value > Integer.MAX_VALUE) {
+            value1 = (int) (value / Integer.MAX_VALUE);
+            logger.debug("New value1:"+value1);
+        } else {
+            value1 = (int) value;
+            logger.debug("New value1:"+value1);
+        }
+    }
+
+    public void printString() {
+        logger.trace ("Start printString");
+        if (value2 != null) {
+            System.out.println(value2.length());
+        }
+    }
+
+    public void printDateAsLong() {
+        logger.trace ("Start printDateAsLong");
+        if (value3 != null) {
+            System.out.println(value3.getTime());
+        }
+    }
+
+    public void divide(int number1, int number2) {
+        logger.trace ("Start divide");
+        try {
+            System.out.println(number1 / number2);
+        } catch (ArithmeticException e) {
+            logger.error("Some ERROR:"+e);
+        }
+    }
+
+    public void setValue1(int value1) {
+        logger.debug("setValue1:"+value1);
+        this.value1 = value1;
+    }
+
+    public void setValue2(String value2) {
+        logger.debug("setValue2:"+value2);
+        this.value2 = value2;
+    }
+
+    public void setValue3(Date value3) {
+        logger.debug("setValue3:"+value3);
+        this.value3 = value3;
+    }
+}
+
+package com.javarush.task.task35.task3501;
+/* 
+Вызов статического метода
+Измени статический метод в классе GenericStatic так, чтобы он стал дженериком.
+Пример вызова дан в методе main.
+
+
+*/
+public class Solution {
+    public static void main(String[] args) {
+        Number number = GenericStatic.<Number>someStaticMethod(new Integer(3));
+    }
+}
+package com.javarush.task.task35.task3501;
+
+public class GenericStatic {
+    public static <T> T someStaticMethod(T genericObject) {
+        System.out.println(genericObject);
+        return genericObject;
+    }
+}
