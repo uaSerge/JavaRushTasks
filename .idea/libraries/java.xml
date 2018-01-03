@@ -6,7 +6,6 @@
     <CLASSES>
       <root url="jar://C:/jdk/lib/commons-lang3-3.7/commons-lang3-3.7.jar!/" />
       <root url="file://C:/jdk/lib/apache-maven-3.5.2" />
-      <root url="file://C:/jdk/lib/apache-maven-3.5.2" />
     </CLASSES>
     <JAVADOC>
       <root url="file://C:/jdk/lib/apache-maven-3.5.2" />
@@ -15,7 +14,6 @@
       <root url="file://C:/jdk/lib/apache-maven-3.5.2" />
     </NATIVE>
     <SOURCES>
-      <root url="file://C:/jdk/lib/apache-maven-3.5.2" />
       <root url="file://C:/jdk/lib/apache-maven-3.5.2" />
     </SOURCES>
     <jarDirectory url="file://C:/jdk/lib/apache-maven-3.5.2" recursive="false" />
