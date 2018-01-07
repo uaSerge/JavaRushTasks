@@ -5,3 +5,5 @@ out.log
 .idea/workspace.xml
 .idea/workspace.xml
 *.xml
+out.log
+*.log
