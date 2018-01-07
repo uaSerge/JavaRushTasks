@@ -5329,47 +5329,4 @@ java.lang.Exception
 2018-01-07 16:00:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
 2018-01-07 16:01:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
 2018-01-07 16:02:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:03:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:04:24 ERROR JavaRushUtil.getCurrentTask(68) - Ошибка получения ключа задачи.
-2018-01-07 16:04:24 ERROR JavaRushUtil.getCurrentTask(68) - Ошибка получения ключа задачи.
-2018-01-07 16:04:24 ERROR JavaRushUtil.getCurrentTask(68) - Ошибка получения ключа задачи.
-2018-01-07 16:04:24 ERROR JavaRushUtil.getCurrentTask(68) - Ошибка получения ключа задачи.
-2018-01-07 16:04:24 ERROR JavaRushUtil.getCurrentTask(68) - Ошибка получения ключа задачи.
-2018-01-07 16:04:24 ERROR JavaRushUtil.getCurrentTask(68) - Ошибка получения ключа задачи.
-2018-01-07 16:04:25 ERROR JavaRushUtil.getCurrentTask(68) - Ошибка получения ключа задачи.
-2018-01-07 16:04:25 ERROR JavaRushUtil.getCurrentTask(68) - Ошибка получения ключа задачи.
-2018-01-07 16:04:33 INFO  ApacheHttpClient.getWebResourceAsStream(420) - responseCode = 200
-2018-01-07 16:04:33 INFO  ApacheHttpClient.getFilteredTasks(307) - responseCode = 200
-2018-01-07 16:04:37 INFO  ApacheHttpClient.getFilteredTasks(307) - responseCode = 200
-2018-01-07 16:04:39 INFO  ApacheHttpClient.getFilteredTasks(307) - responseCode = 200
-2018-01-07 16:04:42 INFO  ApacheHttpClient.getFilteredTasks(307) - responseCode = 200
-2018-01-07 16:04:49 INFO  ApacheHttpClient.getFilteredTasks(307) - responseCode = 200
-2018-01-07 16:04:52 INFO  ApacheHttpClient.getFilteredTasks(307) - responseCode = 200
-2018-01-07 16:05:00 INFO  ApacheHttpClient.getTaskTemplateInfo(324) - responseCode = 200
-2018-01-07 16:05:00 INFO  ApacheHttpClient.testConnection(178) - responseCode = 200
-2018-01-07 16:05:00 INFO  ApacheHttpClient.testConnection(185) - result = true
-2018-01-07 16:05:00 INFO  ApacheHttpClient.testConnection(178) - responseCode = 200
-2018-01-07 16:05:00 INFO  ApacheHttpClient.testConnection(185) - result = true
-2018-01-07 16:05:00 INFO  ApacheHttpClient.getWebResourceAsStream(420) - responseCode = 200
-2018-01-07 16:05:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:06:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:07:06 INFO  ApacheHttpClient.testConnection(178) - responseCode = 200
-2018-01-07 16:07:06 INFO  ApacheHttpClient.testConnection(185) - result = true
-2018-01-07 16:07:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:08:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:09:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:10:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:11:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:12:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:13:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:14:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:15:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:16:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:17:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:18:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:19:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:20:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:21:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:22:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:23:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
-2018-01-07 16:24:54 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
+
