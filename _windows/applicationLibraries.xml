@@ -1,0 +1,11 @@
+<application>
+  <component name="libraryTable">
+    <library name="guava-19.0">
+      <CLASSES>
+        <root url="jar://C:/Idea/JavaRushTasks/lib/guava-19.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+  </component>
+</application>
