@@ -1,5 +1,12 @@
 <application>
   <component name="libraryTable">
+    <library name="commons-collections4-4.0">
+      <CLASSES>
+        <root url="jar://C:/Idea/JavaRushTasks/lib/commons-collections4-4.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="guava-19.0">
       <CLASSES>
         <root url="jar://C:/Idea/JavaRushTasks/lib/guava-19.0.jar!/" />
