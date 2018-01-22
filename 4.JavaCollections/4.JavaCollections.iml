@@ -68,5 +68,14 @@
     </orderEntry>
     <orderEntry type="library" name="commons-collections4-4.0" level="application" />
     <orderEntry type="library" name="guava-19.0" level="application" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../lib/jsoup-1.9.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
