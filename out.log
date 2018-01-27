@@ -6600,3 +6600,4 @@ java.lang.AssertionError: Already disposed: Project (Disposed) JavaRushTasks
 2018-01-27 13:23:22 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
 2018-01-27 13:24:22 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
 2018-01-27 13:25:21 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
+2018-01-27 13:26:22 INFO  ApacheHttpClient.sendEvent(450) - responseCode = 200
